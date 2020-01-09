@@ -10,17 +10,11 @@ router.post('/', auth.optional, (req, res, next) => {
     body: { user },
   } = req;
 
-  if (!user.email) {
-    return next(createError(422, 'email is required'));
-  }
-
-  if (!user.password) {
-    return next(createError(422, 'password is required'));
+  if (!user.id) {
+    return next(createError(422, 'id is required'));
   }
 
   const finalUser = new User(user);
-
-  finalUser.setPassword(user.password);
 
   return finalUser
     .save()
@@ -33,12 +27,8 @@ router.post('/login', auth.optional, (req, res, next) => {
     body: { user },
   } = req;
 
-  if (!user.email) {
-    return next(createError(422, 'email is required'));
-  }
-
-  if (!user.password) {
-    return next(createError(422, 'password is required'));
+  if (!user.id) {
+    return next(createError(422, 'id is required'));
   }
 
   return passport.authenticate(
@@ -77,14 +67,9 @@ router.get('/current', auth.required, (req, res) => {
 router.put('/current', auth.required, async (req, res, next) => {
   const {
     payload: { id },
-    body: { phone, kktPassword, name },
+    body: { update },
   } = req;
 
-  const update = {
-    phone,
-    kktPassword,
-    name,
-  };
   await User.findOneAndUpdate(id, { $set: update }, { new: true })
     .then(user => res.json({ user: user.toAuthJson() }))
     .catch(err => next(err));

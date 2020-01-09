@@ -7,14 +7,13 @@ const { createError } = require('../handlers/error');
 passport.use(
   new LocalStrategy(
     {
-      usernameField: 'user[email]',
-      passwordField: 'user[password]',
+      usernameField: 'user[id]',
     },
-    (email, password, done) => {
-      User.findOne({ email: email.toLowerCase() })
+    (id, done) => {
+      User.findOne({ vk_id: id })
         .then(user => {
-          if (!user || !user.validatePassword(password)) {
-            return done(createError(403, 'Неверный email или пароль'));
+          if (!user) {
+            return done(createError(404, 'Пользователь не найден'));
           }
           return done(null, user);
         })

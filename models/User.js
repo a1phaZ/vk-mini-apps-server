@@ -6,19 +6,12 @@ mongoose.Promise = global.Promise;
 
 const UserSchema = new Schema(
   {
-    email: { type: String, unique: true },
+    id: {type: Number, unique: true},
+    email: { type: String },
     hash: { type: String },
     salt: { type: String },
     name: { type: String },
-    phone: {
-      type: String,
-      validate: {
-        validator: function(v) {
-          return /\d{10}/.test(v);
-        },
-        message: props => `${props.value} is not a valid phone number!`,
-      },
-    },
+    phone: { type: String },
     kktPassword: { type: String },
   },
   { timestamps: true },
@@ -45,6 +38,7 @@ UserSchema.methods.generateJWT = function() {
   return jwt.sign(
     {
       email: this.email,
+      vk_id: this.id,
       id: this._id,
       name: this.name,
       phone: this.phone,
@@ -58,6 +52,7 @@ UserSchema.methods.generateJWT = function() {
 UserSchema.methods.toAuthJson = function() {
   return {
     _id: this._id,
+    vk_id: this.id,
     email: this.email,
     token: this.generateJWT(),
     name: this.name,
