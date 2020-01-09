@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "set NODE_ENV=\"dev\" && nodemon app.js",
-    "test": "nodemon --exec \"mocha --timeout 10000\""
+    "start": "set NODE_ENV=\"dev\" && nodemon app.js"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
@@ -24,10 +23,5 @@
     "passport-local": "^1.0.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4"
-  },
-  "devDependencies": {
-    "chai": "^4.2.0",
-    "chai-http": "^4.3.0",
-    "mocha": "^6.2.2"
   }
 }
