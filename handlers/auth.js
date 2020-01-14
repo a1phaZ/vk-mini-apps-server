@@ -10,7 +10,6 @@ const getTokenFromHeaders = req => {
   return null;
 };
 
-//TODO Обработать ошибку при неправильном токене
 const auth = {
   required: jwt({
     secret: 'secret',

@@ -5,8 +5,8 @@ const createError = (statusCode, message) => {
 };
 
 const handleError = (err, res) => {
-  const { statusCode, message } = err;
-  res.status(statusCode).json({
+  const { statusCode, status, message } = err;
+  res.status(statusCode || status).json({
     error: {
       status: 'error',
       statusCode,
