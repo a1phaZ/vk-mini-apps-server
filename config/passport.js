@@ -10,7 +10,7 @@ passport.use(
       usernameField: 'user[id]',
     },
     (id, done) => {
-      User.findOne({ vk_id: id })
+      User.findOne({ id: id })
         .then(user => {
           if (!user) {
             return done(createError(404, 'Пользователь не найден'));
