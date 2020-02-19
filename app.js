@@ -7,6 +7,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const { createError, handleError } = require('./handlers/error');
+const MongoStore = require('connect-mongo')(session);
 
 dotenv.config();
 
@@ -46,8 +47,12 @@ app.use(
   session({
     secret: 'balance',
     cookie: { maxAge: 60000 },
-    resave: false,
+    resave: true,
     saveUninitialized: false,
+    store: new MongoStore({
+      url: dbPath,
+      collection: 'sessions'
+    })
   }),
 );
 
