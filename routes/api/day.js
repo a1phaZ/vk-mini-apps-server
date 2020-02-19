@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const auth = require('../../handlers/auth');
 const fns = require('../../handlers/fns');
 const {
   getDay,
@@ -8,14 +7,15 @@ const {
   updateDay,
   postDayByReceipt,
 } = require('../../controllers/day');
+const requiresLogin = require('../../handlers/requires-login');
 
-router.get('/', auth.required, getAllDays);
-router.get('/:year/:month/:day', auth.required, getDay);
-router.post('/', auth.required, postDay);
-router.put('/:year/:month/:day', auth.required, updateDay);
+router.get('/', requiresLogin, getAllDays);
+router.get('/:year/:month/:day', requiresLogin, getDay);
+router.post('/', requiresLogin, postDay);
+router.put('/:year/:month/:day', requiresLogin, updateDay);
 router.post(
   '/receipt',
-  auth.required,
+  requiresLogin,
   fns.check,
   fns.receive,
   fns.receive,

@@ -1,8 +1,8 @@
 const router = require('express').Router();
-const auth = require('../../handlers/auth');
 const { register, restorePassword } = require('../../handlers/fns');
+const requiresLogin = require('../../handlers/requires-login');
 
-router.get('/register', auth.required, register);
-router.get('/restore', auth.required, restorePassword);
+router.get('/register', requiresLogin, register);
+router.get('/restore', requiresLogin, restorePassword);
 
 module.exports = router;
