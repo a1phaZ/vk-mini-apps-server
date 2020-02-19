@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 const passport = require('passport');
 const router = require('express').Router();
-const auth = require('../../handlers/auth');
 const { createError } = require('../../handlers/error');
 const User = mongoose.model('User');
+const requiresLogin = require('../../handlers/requires-login');
 
-router.post('/', auth.optional, (req, res, next) => {
+router.post('/', (req, res, next) => {
   const {
     body: { user },
   } = req;
@@ -14,46 +14,33 @@ router.post('/', auth.optional, (req, res, next) => {
     return next(createError(422, 'id is required'));
   }
 
-  const finalUser = new User(user);
+  User.authenticate( user.id, function (error, dbUser) {
+    if (error) {
+      return next(error);
+    }
 
-  return finalUser
-    .save()
-    .then(() => res.json({ user: finalUser.toAuthJson() }))
-    .catch(err => next(err));
+    if (!dbUser) {
+      const finalUser = new User(user);
+      return finalUser
+        .save()
+        .then(() => {
+          req.session.userId = finalUser._id;
+          res.json({user: finalUser.toAuthJson()});
+        })
+        .catch(err => next(err));
+    }
+
+    req.session.userId = dbUser._id;
+    return res.status(200).json({ user: dbUser.toAuthJson() });
+  });
 });
 
-router.post('/login', auth.optional, (req, res, next) => {
+router.get('/profile', requiresLogin, (req, res, next) => {
   const {
-    body: { user },
+    session: { userId },
   } = req;
 
-  if (!user.id) {
-    return next(createError(422, 'id is required'));
-  }
-
-  return passport.authenticate(
-    'local',
-    { session: false },
-    (err, passportUser) => {
-      if (err) {
-        return next(err);
-      }
-
-      if (passportUser) {
-        const user = passportUser;
-        user.token = passportUser.generateJWT();
-        return res.status(200).json({ user: user.toAuthJson() });
-      }
-    },
-  )(req, res, next);
-});
-
-router.get('/current', auth.required, (req, res) => {
-  const {
-    payload: { id },
-  } = req;
-
-  return User.findById(id)
+  User.findById(userId)
     .then(user => {
       if (!user) {
         return res.sendStatus(400);
@@ -63,16 +50,16 @@ router.get('/current', auth.required, (req, res) => {
     })
     .catch(err => next(err));
 });
-
-router.put('/current', auth.required, async (req, res, next) => {
-  const {
-    payload: { id },
-    body: { update },
-  } = req;
-
-  await User.findOneAndUpdate(id, { $set: update }, { new: true })
-    .then(user => res.json({ user: user.toAuthJson() }))
-    .catch(err => next(err));
-});
+//
+// router.put('/current', auth.required, async (req, res, next) => {
+//   const {
+//     payload: { id },
+//     body: { update },
+//   } = req;
+//
+//   await User.findOneAndUpdate(id, { $set: update }, { new: true })
+//     .then(user => res.json({ user: user.toAuthJson() }))
+//     .catch(err => next(err));
+// });
 
 module.exports = router;

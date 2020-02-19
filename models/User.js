@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
+const {createError} = require("../handlers/error");
 const { Schema, model } = mongoose;
 mongoose.Promise = global.Promise;
 
@@ -16,6 +17,19 @@ const UserSchema = new Schema(
   },
   { timestamps: true },
 );
+
+UserSchema.statics.authenticate = function(id, done) {
+  User.findOne({ id: id }).exec(function (err, user) {
+    if (err) {
+      return done(err);
+    } else if (!user) {
+      return done(null, null);
+    }
+    console.log({auth: user});
+    return done(null, user);
+  });
+};
+
 
 UserSchema.methods.setPassword = function(password) {
   this.salt = crypto.randomBytes(16).toString('hex');
