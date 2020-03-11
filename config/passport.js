@@ -8,12 +8,13 @@ passport.use(
   new LocalStrategy(
     {
       usernameField: 'user[id]',
+      passwordField: 'user[password]'
     },
-    (id, done) => {
+    (id, password, done) => {
       User.findOne({ id: id })
         .then(user => {
-          if (!user) {
-            return done(createError(404, 'Пользователь не найден'));
+          if (!user || !user.validatePassword(password)) {
+            return done(createError(404, 'Пользователь не найден или пароль неверный'));
           }
           return done(null, user);
         })

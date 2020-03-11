@@ -4,8 +4,9 @@ const router = require('express').Router();
 const { createError } = require('../../handlers/error');
 const User = mongoose.model('User');
 const requiresLogin = require('../../handlers/requires-login');
+const auth = require("../../handlers/auth");
 
-router.post('/', (req, res, next) => {
+router.post('/register', auth.optional, (req, res, next) => {
   const {
     body: { user },
   } = req;
@@ -14,25 +15,31 @@ router.post('/', (req, res, next) => {
     return next(createError(422, 'id is required'));
   }
 
-  User.authenticate( user.id, function (error, dbUser) {
-    if (error) {
-      return next(error);
-    }
+  if (!user.password) {
+    return next(createError(422, 'password is required'));
+  }
 
-    if (!dbUser) {
-      const finalUser = new User(user);
-      return finalUser
-        .save()
-        .then(() => {
-          req.session.userId = finalUser._id;
-          res.json({user: finalUser.toAuthJson()});
-        })
-        .catch(err => next(err));
-    }
+  const finalUser = new User(user);
+  finalUser.setPassword(user.password);
+  return finalUser
+    .save()
+    .then(() => {
+      res.json({user: finalUser.toAuthJson()});
+    })
+    .catch(err => next(err));
 
-    req.session.userId = dbUser._id;
-    return res.status(200).json({ user: dbUser.toAuthJson() });
-  });
+  // User.authenticate( user.id, function (error, dbUser) {
+  //   if (error) {
+  //     return next(error);
+  //   }
+  //
+  //   if (!dbUser) {
+  //
+  //   }
+  //
+  //   req.session.userId = dbUser._id;
+  //   return res.status(200).json({ user: dbUser.toAuthJson() });
+  // });
 });
 
 router.get('/profile', requiresLogin, (req, res, next) => {
