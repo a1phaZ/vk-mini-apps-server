@@ -3,7 +3,6 @@ const passport = require('passport');
 const router = require('express').Router();
 const { createError } = require('../../handlers/error');
 const User = mongoose.model('User');
-const requiresLogin = require('../../handlers/requires-login');
 const auth = require("../../handlers/auth");
 
 router.post('/register', auth.optional, (req, res, next) => {
@@ -27,27 +26,45 @@ router.post('/register', auth.optional, (req, res, next) => {
       res.json({user: finalUser.toAuthJson()});
     })
     .catch(err => next(err));
-
-  // User.authenticate( user.id, function (error, dbUser) {
-  //   if (error) {
-  //     return next(error);
-  //   }
-  //
-  //   if (!dbUser) {
-  //
-  //   }
-  //
-  //   req.session.userId = dbUser._id;
-  //   return res.status(200).json({ user: dbUser.toAuthJson() });
-  // });
 });
 
-router.get('/profile', requiresLogin, (req, res, next) => {
+router.post('/login', auth.optional, (req, res, next) => {
   const {
-    session: { userId },
+    body: { user }
   } = req;
 
-  User.findById(userId)
+  if (!user.id) {
+    return next(createError(422, 'id is required'));
+  }
+
+  if (!user.password) {
+    return next(createError(422, 'password is required'));
+  }
+
+  return passport.authenticate('local', {session: false}, (err, passportUser, info)=> {
+    if(err) {
+      return next(err);
+    }
+
+    if (passportUser) {
+      const user = passportUser;
+      user.token = passportUser.generateJWT();
+
+      return res.json({ user: user.toAuthJson() });
+    }
+
+    return res.status(400).json(info);
+  })(req, res, next);
+});
+
+router.get('/profile', auth.required, (req, res, next) => {
+  const {
+    payload: { id },
+  } = req;
+
+  console.log(`get ${id}`);
+
+  User.findById(id)
     .then(user => {
       if (!user) {
         return res.sendStatus(400);
@@ -57,16 +74,16 @@ router.get('/profile', requiresLogin, (req, res, next) => {
     })
     .catch(err => next(err));
 });
-//
-// router.put('/current', auth.required, async (req, res, next) => {
-//   const {
-//     payload: { id },
-//     body: { update },
-//   } = req;
-//
-//   await User.findOneAndUpdate(id, { $set: update }, { new: true })
-//     .then(user => res.json({ user: user.toAuthJson() }))
-//     .catch(err => next(err));
-// });
+
+router.put('/profile', auth.required, async (req, res, next) => {
+  const {
+    payload: { id },
+    body: { update },
+  } = req;
+
+  await User.findOneAndUpdate({_id: id}, { $set: update }, { new: true })
+    .then(user => res.json({ user: user.toAuthJson() }))
+    .catch(err => next(err));
+});
 
 module.exports = router;

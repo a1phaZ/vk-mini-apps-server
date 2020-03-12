@@ -24,7 +24,7 @@ mongoose.connect(dbPath, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
-  useFindAndModify: true,
+  useFindAndModify: false,
 });
 mongoose.connection.on('connected', () =>
   console.log(`MongoDB connection established successfully`),

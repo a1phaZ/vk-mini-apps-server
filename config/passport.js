@@ -2,7 +2,6 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
 const User = require('../models/User');
-const { createError } = require('../handlers/error');
 
 passport.use(
   new LocalStrategy(
@@ -11,10 +10,11 @@ passport.use(
       passwordField: 'user[password]'
     },
     (id, password, done) => {
+      console.log({id, password});
       User.findOne({ id: id })
         .then(user => {
           if (!user || !user.validatePassword(password)) {
-            return done(createError(404, 'Пользователь не найден или пароль неверный'));
+            return done(null, false, { errors: { 'email or password' : 'is invalid'}});
           }
           return done(null, user);
         })
