@@ -10,11 +10,10 @@ passport.use(
       passwordField: 'user[password]'
     },
     (id, password, done) => {
-      console.log({id, password});
       User.findOne({ id: id })
         .then(user => {
           if (!user || !user.validatePassword(password)) {
-            return done(null, false, { errors: { 'email or password' : 'is invalid'}});
+            return done(null, false, { errors: { header: 'email or password', text: 'is invalid'}});
           }
           return done(null, user);
         })
