@@ -13,7 +13,7 @@ passport.use(
       User.findOne({ id: id })
         .then(user => {
           if (!user || !user.validatePassword(password)) {
-            return done(null, false, { errors: { header: 'email or password', text: 'is invalid'}});
+            return done(null, false, { error: { status: 'Ошибка авторизации', message: 'В базе данных нет запрашиваемой комбинации пользователь/пароль. Возможно вы не зарегистрированы.'}});
           }
           return done(null, user);
         })
