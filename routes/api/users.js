@@ -67,8 +67,6 @@ router.get('/profile', auth.required, (req, res, next) => {
     payload: { id },
   } = req;
 
-  console.log(`get ${id}`);
-
   User.findById(id)
     .then(user => {
       if (!user) {
