@@ -8,11 +8,12 @@ const {
   postDayByReceipt,
 } = require('../../controllers/day');
 const requiresLogin = require('../../handlers/requires-login');
+const auth = require("../../handlers/auth");
 
-router.get('/', requiresLogin, getAllDays);
-router.get('/:year/:month/:day', requiresLogin, getDay);
-router.post('/', requiresLogin, postDay);
-router.put('/:year/:month/:day', requiresLogin, updateDay);
+router.get('/', auth.required, getAllDays);
+router.get('/:year/:month/:day', auth.required, getDay);
+router.post('/', auth.required, postDay);
+router.put('/:year/:month/:day', auth.required, updateDay);
 router.post(
   '/receipt',
   requiresLogin,
