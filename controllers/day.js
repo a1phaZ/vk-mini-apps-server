@@ -32,16 +32,15 @@ exports.getAllDays = (req, res, next) => {
 
 exports.postDay = async (req, res, next) => {
   const {
-    body: { day, month, year, items },
+    body: { date, items },
     payload: { id },
   } = req;
-  const d = prepareDate(day, month, year);
-  await Day.findOne({ userId: id, dateTime: d })
+  await Day.findOne({ userId: id, dateTime: date })
     .then(async day => {
       if (!day) {
         const newDay = new Day({
           userId: id,
-          dateTime: d,
+          dateTime: date,
           items,
         });
         newDay
@@ -52,10 +51,10 @@ exports.postDay = async (req, res, next) => {
           .catch(err => next(err));
       } else {
         await Day.updateOne(
-          { userId: id, dateTime: d },
+          { userId: id, dateTime: date },
           { $push: { items: items } },
         ).then(async () => {
-          await Day.findOne({ userId: id, dateTime: d }).then(day => {
+          await Day.findOne({ userId: id, dateTime: date }).then(day => {
             return res.status(200).json(day);
           });
         });
