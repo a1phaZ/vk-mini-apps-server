@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "set NODE_ENV=\"dev\" && nodemon app.js"
+    "dev": "set NODE_ENV=\"dev\" && nodemon app.js",
+    "start": "set NODE_ENV=\"production\" && node app.js"
   },
   "dependencies": {
     "connect-mongo": "^3.2.0",
