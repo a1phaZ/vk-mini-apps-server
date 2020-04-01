@@ -20,13 +20,23 @@ exports.getDay = (req, res, next) => {
     .catch(err => next(err));
 };
 
-exports.getAllDays = (req, res, next) => {
+exports.getDays = (req, res, next) => {
   const {
     payload: { id },
+    query,
   } = req;
-  Day.find({ userId: id })
+  console.log(query);
+  const dateRange = prepareDateRange(query.date);
+  console.log(dateRange);
+  Day.find({
+    userId: id,
+    dateTime: {$gte: dateRange.startDate, $lte: dateRange.endDate}
+  })
     .sort({ dateTime: 1 })
-    .then(days => res.status(200).json(days))
+    .then(days => {
+      console.log(days);
+      res.status(200).json(days)
+    })
     .catch(err => next(err));
 };
 
@@ -149,4 +159,15 @@ checkReceipt = async (target, obj) => {
     return result;
   }
   return true;
+};
+
+prepareDateRange = (date) => {
+  const currentDate = new Date(date);
+  const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth());
+  const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth()+1);
+
+  return {
+    startDate,
+    endDate
+  }
 };
