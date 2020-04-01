@@ -25,16 +25,13 @@ exports.getDays = (req, res, next) => {
     payload: { id },
     query,
   } = req;
-  console.log(query);
   const dateRange = prepareDateRange(query.date);
-  console.log(dateRange);
   Day.find({
     userId: id,
     dateTime: {$gte: dateRange.startDate, $lte: dateRange.endDate}
   })
     .sort({ dateTime: 1 })
     .then(days => {
-      console.log(days);
       res.status(200).json(days)
     })
     .catch(err => next(err));
