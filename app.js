@@ -1,3 +1,5 @@
+const https = require('https');
+const fs = require('fs');
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
@@ -67,6 +69,11 @@ app.use(function(req, res, next) {
 // error-box handler
 app.use((err, req, res, next) => handleError(err, res));
 
-app.listen(process.env.PORT || 3000);
+https.createServer({
+  key: fs.readFileSync(process.env.SSL_PRIVATE_KEY_PATH),
+  cert: fs.readFileSync(process.env.SSL_CERTIFICATE_PATH)
+}, app).listen(process.env.PORT || 3000, () => {
+  console.log('Listening...');
+});
 
 module.exports = app;

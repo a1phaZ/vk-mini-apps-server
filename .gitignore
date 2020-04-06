@@ -2,3 +2,5 @@
 /.env
 /yarn.lock
 /.idea/
+/*.csr
+/*.key
