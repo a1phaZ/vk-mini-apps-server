@@ -1,4 +1,5 @@
 const https = require('https');
+const http = require('http');
 const fs = require('fs');
 const express = require('express');
 const session = require('express-session');
@@ -69,11 +70,16 @@ app.use(function(req, res, next) {
 // error-box handler
 app.use((err, req, res, next) => handleError(err, res));
 
-https.createServer({
-  key: fs.readFileSync(process.env.SSL_PRIVATE_KEY_PATH),
-  cert: fs.readFileSync(process.env.SSL_CERTIFICATE_PATH)
-}, app).listen(process.env.PORT || 3000, () => {
-  console.log('Listening...');
-});
+if (process.env.SSL_PRIVATE_KEY_PATH && process.env.SSL_CERTIFICATE_PATH) {
+  https.createServer({
+    key: fs.readFileSync(process.env.SSL_PRIVATE_KEY_PATH),
+    cert: fs.readFileSync(process.env.SSL_CERTIFICATE_PATH)
+  }, app).listen(process.env.PORT || 8080, () => {
+    console.log('Listening HTTPS...');
+  });
+}
 
+http.createServer(app).listen(3000, () => {
+  console.log('Listening HTTP...');
+});
 module.exports = app;
