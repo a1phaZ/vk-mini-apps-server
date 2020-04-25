@@ -32,7 +32,7 @@ receive = async (req, res, next) => {
     } = req;
     const uri = `https://proverkacheka.nalog.ru:9999/v1/inns/*/kkts/*/fss/${fn}/tickets/${fd}?fiscalSign=${fp}&sendToEmail=no`;
     const auth =
-      'Basic ' + new Buffer(`+7${phone}` + ':' + password).toString('base64');
+      'Basic ' + new Buffer(phone + ':' + password).toString('base64');
     const opt = {
       method: 'GET',
       uri,
@@ -76,14 +76,14 @@ register = async (req, res, next) => {
     body: {
       email,
       name,
-      phone: `+7${phone}`,
+      phone: phone,
     },
     resolveWithFullResponse: true,
   };
   await rp(opt)
     .then(() =>
       res.status(200).json({
-        message: `Пользователь создан, на телефон +7${phone} отправлено сообщение с паролем`,
+        message: `Пользователь создан, на телефон ${phone} отправлено сообщение с паролем`,
       }),
     )
     .catch(err => {
@@ -101,14 +101,14 @@ restorePassword = async (req, res, next) => {
     uri,
     json: true,
     body: {
-      phone: `+7${phone}`,
+      phone: phone,
     },
     resolveWithFullResponse: true,
   };
   await rp(opt)
     .then(() =>
       res.status(200).json({
-        message: `На телефон +7${phone} отправлено сообщение с новым паролем`,
+        message: `На телефон ${phone} отправлено сообщение с новым паролем`,
       }),
     )
     .catch(err => next(err));
