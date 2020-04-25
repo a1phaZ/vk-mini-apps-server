@@ -81,7 +81,7 @@ if (process.env.SSL_PRIVATE_KEY_PATH && process.env.SSL_CERTIFICATE_PATH) {
   });
 }
 
-http.createServer(app).listen(3000, () => {
+http.createServer(app).listen(80, () => {
   console.log('Listening HTTP...');
 });
 module.exports = app;
