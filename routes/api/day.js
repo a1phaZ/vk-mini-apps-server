@@ -7,7 +7,6 @@ const {
   updateDay,
   postDayByReceipt,
 } = require('../../controllers/day');
-const requiresLogin = require('../../handlers/requires-login');
 const auth = require("../../handlers/auth");
 
 router.get('/', auth.required, getDays);
@@ -16,7 +15,7 @@ router.post('/', auth.required, postDay);
 router.put('/:year/:month/:day', auth.required, updateDay);
 router.post(
   '/receipt',
-  requiresLogin,
+  auth.required,
   fns.check,
   fns.receive,
   fns.receive,
