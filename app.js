@@ -16,6 +16,8 @@ dotenv.config();
 
 const app = express();
 
+app.use(express.static(__dirname, { dotfiles: 'allow' } ));
+
 app.disable('x-powered-by');
 
 mongoose.Promise = global.Promise;
