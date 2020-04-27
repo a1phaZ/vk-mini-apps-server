@@ -114,11 +114,40 @@ restorePassword = async (req, res, next) => {
     .catch(err => next(err));
 };
 
+password = async (req, res, next) => {
+  const {
+    body,
+    query: {
+      type
+    }
+  } = req;
+  const opt = {
+    method: 'POST',
+    uri: `https://proverkacheka.nalog.ru:9999/v1/mobile/users/${type}`,
+    json: true,
+    body,
+    resolveWithFullResponse: true,
+  };
+  await rp(opt)
+    .then((r) => {
+        console.log(r);
+        res.status(200).json({
+          message: `На телефон ${body.phone} отправлено сообщение с паролем`,
+        });
+      }
+    )
+    .catch(err => {
+      console.log(err);
+      next(err)
+    });
+};
+
 const fns = {
   receive,
   check,
   register,
   restorePassword,
+  password
 };
 
 module.exports = fns;
