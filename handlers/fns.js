@@ -3,9 +3,9 @@ const rp = require('request-promise');
 check = async (req, res, next) => {
   console.log('Check receipt');
   const {
-    body: { fn, fd, fp, date, sum },
+    body: { fn, i, fp, dt, sum },
   } = req;
-  const uri = `https://proverkacheka.nalog.ru:9999/v1/ofds/*/inns/*/fss/${fn}/operations/1/tickets/${fd}?fiscalSign=${fp}&date=${date}&sum=${sum}`;
+  const uri = `https://proverkacheka.nalog.ru:9999/v1/ofds/*/inns/*/fss/${fn}/operations/1/tickets/${i}?fiscalSign=${fp}&date=${dt}&sum=${sum}`;
   const opt = {
     method: 'GET',
     uri,
@@ -14,7 +14,8 @@ check = async (req, res, next) => {
   };
   await rp(opt)
     .then(response => {
-      res.locals.receiptAvailable = response.statusCode === 204;
+      // res.locals.receiptAvailable = response.statusCode === 204;
+      res.status(response.statusCode).json({statusCode: response.statusCode});
       next();
     })
     .catch(err => next(err));

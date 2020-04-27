@@ -13,13 +13,14 @@ router.get('/', auth.required, getDays);
 router.get('/:year/:month/:day', auth.required, getDay);
 router.post('/', auth.required, postDay);
 router.put('/:year/:month/:day', auth.required, updateDay);
-router.post(
-  '/receipt',
-  auth.required,
-  fns.check,
-  fns.receive,
-  fns.receive,
-  postDayByReceipt,
-);
+router.post('/receipt', auth.optional, fns.check);
+// router.post(
+//   '/receipt',
+//   auth.required,
+//   fns.check,
+//   fns.receive,
+//   fns.receive,
+//   postDayByReceipt,
+// );
 
 module.exports = router;
