@@ -64,56 +64,6 @@ receive = async (req, res, next) => {
   }
 };
 
-register = async (req, res, next) => {
-  const {
-    payload: { phone, name, email },
-  } = req;
-  const uri = `https://proverkacheka.nalog.ru:9999/v1/mobile/users/signup`;
-  const opt = {
-    method: 'POST',
-    uri,
-    json: true,
-    body: {
-      email,
-      name,
-      phone: phone,
-    },
-    resolveWithFullResponse: true,
-  };
-  await rp(opt)
-    .then(() =>
-      res.status(200).json({
-        message: `Пользователь создан, на телефон ${phone} отправлено сообщение с паролем`,
-      }),
-    )
-    .catch(err => {
-      next(err);
-    });
-};
-
-restorePassword = async (req, res, next) => {
-  const {
-    payload: { phone },
-  } = req;
-  const uri = `https://proverkacheka.nalog.ru:9999/v1/mobile/users/restore`;
-  const opt = {
-    method: 'POST',
-    uri,
-    json: true,
-    body: {
-      phone: phone,
-    },
-    resolveWithFullResponse: true,
-  };
-  await rp(opt)
-    .then(() =>
-      res.status(200).json({
-        message: `На телефон ${phone} отправлено сообщение с новым паролем`,
-      }),
-    )
-    .catch(err => next(err));
-};
-
 password = async (req, res, next) => {
   const {
     body,
@@ -129,15 +79,14 @@ password = async (req, res, next) => {
     resolveWithFullResponse: true,
   };
   await rp(opt)
-    .then((r) => {
-        console.log(r);
+    .then(() => {
         res.status(200).json({
           message: `На телефон ${body.phone} отправлено сообщение с паролем`,
         });
       }
     )
     .catch(err => {
-      console.log(err);
+      //TODO обработка ошибок
       next(err)
     });
 };
@@ -145,8 +94,6 @@ password = async (req, res, next) => {
 const fns = {
   receive,
   check,
-  register,
-  restorePassword,
   password
 };
 
