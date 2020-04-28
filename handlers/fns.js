@@ -44,14 +44,19 @@ checkAndReceive = async (req, res, next) => {
 
       await rp(opt)
         .then(response => {
-          res.status(200).json(response);
-          // if (response.body === undefined) {
-          //   next();
-          // } else if (response.body.document.receipt) {
-          //   const { dateTime, totalSum, items } = response.body.document.receipt;
-          //   res.locals.receiptData = { dateTime, totalSum, items };
-          //   next();
-          // }
+          if (response.body) {
+            res.status(200).json({
+              check: true,
+              body: false
+            });
+          } else if (response.body.document.receipt) {
+            const { dateTime, totalSum, items } = response.body.document.receipt;
+            res.locals.receiptData = { dateTime, totalSum, items };
+            res.status(200).json({
+              check: true,
+              body: true
+            })
+          }
         })
         .catch(err => {
           next(err);
