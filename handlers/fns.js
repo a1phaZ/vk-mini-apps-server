@@ -29,7 +29,7 @@ checkAndReceive = async (req, res, next) => {
       break;
     case 'receive':
       const auth =
-        'Basic ' + new Buffer(phone + ':' + password).toString('base64');
+        'Basic ' + new Buffer(phone.replace(/[ ()-]/g, '') + ':' + password).toString('base64');
       opt = {
         method: 'GET',
         uri: `https://proverkacheka.nalog.ru:9999/v1/inns/*/kkts/*/fss/${fn}/tickets/${i}?fiscalSign=${fp}&sendToEmail=no`,
