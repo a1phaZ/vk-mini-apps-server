@@ -47,6 +47,7 @@ checkAndReceive = async (req, res, next) => {
           if (response.body) {
             res.status(200).json({
               check: true,
+              statusCode: response.statusCode,
               body: false
             });
           } else if (response.body.document.receipt) {
@@ -54,6 +55,7 @@ checkAndReceive = async (req, res, next) => {
             res.locals.receiptData = { dateTime, totalSum, items };
             res.status(200).json({
               check: true,
+              statusCode: response.statusCode,
               body: true
             })
           }
