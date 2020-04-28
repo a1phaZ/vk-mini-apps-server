@@ -56,8 +56,10 @@ checkAndReceive = async (req, res, next) => {
             res.status(200).json({
               check: true,
               statusCode: response.statusCode,
-              body: true
+              body: true,
+              response: res.locals.receiptData
             })
+            next();
           }
         })
         .catch(err => {
