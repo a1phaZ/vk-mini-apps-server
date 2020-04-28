@@ -44,7 +44,7 @@ checkAndReceive = async (req, res, next) => {
 
       await rp(opt)
         .then(response => {
-          if (response.body) {
+          if (!response.body) {
             res.status(200).json({
               check: true,
               statusCode: response.statusCode,
