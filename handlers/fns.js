@@ -15,7 +15,7 @@ check = async (req, res, next) => {
   await rp(opt)
     .then(response => {
       // res.locals.receiptAvailable = response.statusCode === 204;
-      res.status(response.statusCode).json({statusCode: response.statusCode});
+      res.status(200).json({statusCode: response.statusCode});
       next();
     })
     .catch(err => next(err));
