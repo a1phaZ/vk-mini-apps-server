@@ -10,8 +10,6 @@ router.post('/register', auth.optional, (req, res, next) => {
     body: { user },
   } = req;
 
-  console.log(user);
-
   if (!user.id) {
     return next(createError(422, 'id is required'));
   }
@@ -28,7 +26,6 @@ router.post('/register', auth.optional, (req, res, next) => {
       res.json({user: finalUser.toAuthJson()});
     })
     .catch(err => {
-      console.log(err);
       next(err);
     });
 });

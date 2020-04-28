@@ -26,7 +26,6 @@ checkAndReceive = async (req, res, next) => {
           });
         })
         .catch(err => {
-          console.log(err);
           next(err)
         });
       break;
@@ -56,12 +55,6 @@ checkAndReceive = async (req, res, next) => {
           } else if (response.body.document.receipt) {
             const { dateTime, totalSum, items } = response.body.document.receipt;
             res.locals.receiptData = { dateTime, totalSum, items };
-            // res.status(200).json({
-            //   check: true,
-            //   statusCode: response.statusCode,
-            //   body: true,
-            //   receiptData: { dateTime, totalSum, items }
-            // })
             next();
           }
         })
@@ -74,74 +67,6 @@ checkAndReceive = async (req, res, next) => {
       break;
   }
 }
-
-// check = async (req, res, next) => {
-//   console.log('Check receipt');
-//   const {
-//     body: { fn, i, fp, dt, sum },
-//   } = req;
-//   const uri = `https://proverkacheka.nalog.ru:9999/v1/ofds/*/inns/*/fss/${fn}/operations/1/tickets/${i}?fiscalSign=${fp}&date=${dt}&sum=${sum}`;
-//   const opt = {
-//     method: 'GET',
-//     uri,
-//     json: true,
-//     resolveWithFullResponse: true,
-//   };
-//   await rp(opt)
-//     .then(response => {
-//       // res.locals.receiptAvailable = response.statusCode === 204;
-//       res.status(200).json({
-//         statusCode: response.statusCode,
-//         check: true
-//       });
-//       next();
-//     })
-//     .catch(err => next(err));
-// };
-//
-// receive = async (req, res, next) => {
-//   console.log('Receive receipt data');
-//   const {
-//     locals: { receiptAvailable },
-//   } = res;
-//   if (receiptAvailable) {
-//     const {
-//       body: { fn, fd, fp },
-//       payload: { phone, password },
-//     } = req;
-//     const uri = `https://proverkacheka.nalog.ru:9999/v1/inns/*/kkts/*/fss/${fn}/tickets/${fd}?fiscalSign=${fp}&sendToEmail=no`;
-//     const auth =
-//       'Basic ' + new Buffer(phone + ':' + password).toString('base64');
-//     const opt = {
-//       method: 'GET',
-//       uri,
-//       json: true,
-//       resolveWithFullResponse: true,
-//       headers: {
-//         Authorization: auth,
-//         'device-id': '',
-//         'device-os': '',
-//       },
-//     };
-//
-//     await rp(opt)
-//       .then(response => {
-//         if (response.body === undefined) {
-//           next();
-//         } else if (response.body.document.receipt) {
-//           const { dateTime, totalSum, items } = response.body.document.receipt;
-//           res.locals.receiptData = { dateTime, totalSum, items };
-//           next();
-//         }
-//       })
-//       .catch(err => {
-//         next(err);
-//       });
-//   } else {
-//     res.locals.receiptData = null;
-//     next();
-//   }
-// };
 
 password = async (req, res, next) => {
   const {
