@@ -136,7 +136,7 @@ exports.postDayByReceipt = async (req, res, next) => {
       })
       .catch(err => next(err));
   } else {
-    res.status(404).json({
+    await res.status(404).json({
       message: 'Чек не был найден',
     });
   }
