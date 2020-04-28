@@ -25,7 +25,10 @@ checkAndReceive = async (req, res, next) => {
             check: true
           });
         })
-        .catch(err => next(err));
+        .catch(err => {
+          console.log(err);
+          next(err)
+        });
       break;
     case 'receive':
       const auth =
