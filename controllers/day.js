@@ -90,6 +90,7 @@ exports.postDayByReceipt = async (req, res, next) => {
   const {
     locals: { receiptData },
   } = res;
+  console.log(res.locals);
   console.log({ receiptData });
   if (receiptData) {
     const {
