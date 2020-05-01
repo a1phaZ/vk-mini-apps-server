@@ -160,7 +160,8 @@ checkReceipt = async (target, obj) => {
 prepareDateRange = (date) => {
   const currentDate = new Date(date);
   const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth());
-  const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth()+1);
+  //
+  const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 0);
 
   return {
     startDate,
