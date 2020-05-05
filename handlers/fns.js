@@ -8,6 +8,8 @@ checkAndReceive = async (req, res, next) => {
     body: { fn, i, fp, dt, sum },
     query: { action }
   } = req;
+  //TODO Добавить проверку phone и password, если токен истек
+  // Вывод ошибки с предложением авторизоваться снова
   let opt = {};
   switch (action) {
     case 'check':
