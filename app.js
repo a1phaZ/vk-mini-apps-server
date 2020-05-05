@@ -30,10 +30,9 @@ mongoose.connect(dbPath, {
   useCreateIndex: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
-  authSource: {
-    user: process.env.MONGO_USER,
-    pass: process.env.MONGO_PWD
-  }
+  authSource: process.env.MONGO_AUTH_SOURCE,
+  user: process.env.MONGO_USER,
+  pass: process.env.MONGO_PWD
 });
 mongoose.connection.on('connected', () =>
   console.log(`MongoDB connection established successfully`),
