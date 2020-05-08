@@ -21,18 +21,20 @@ app.use(express.static(__dirname, { dotfiles: 'allow' } ));
 app.disable('x-powered-by');
 
 mongoose.Promise = global.Promise;
-const dbPath =
-  process.env.NODE_ENV !== 'test'
-    ? process.env.MONGODB_URI || process.env.MONGOLAB_URI
-    : process.env.MONGODB_URI_TEST;
+// const dbPath =
+//   process.env.NODE_ENV !== 'test'
+//     ? process.env.MONGODB_URI || process.env.MONGOLAB_URI
+//     : process.env.MONGODB_URI_TEST;
+const dbPath = `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PWD}@${process.env.MONGO_PATH}:${process.env.MONGO_PORT}/${process.env.MONGO_BASE}?authSourse=${process.env.MONGO_BASE}`;
+console.log(dbPath);
 mongoose.connect(dbPath, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
-  authSource: process.env.MONGO_AUTH_SOURCE,
-  user: process.env.MONGO_USER,
-  pass: process.env.MONGO_PWD
+  // authSource: process.env.MONGO_AUTH_SOURCE,
+  // user: process.env.MONGO_USER,
+  // pass: process.env.MONGO_PWD
 });
 mongoose.connection.on('connected', () =>
   console.log(`MongoDB connection established successfully`),
@@ -40,8 +42,8 @@ mongoose.connection.on('connected', () =>
 mongoose.connection.on('disconnected', () =>
   console.log(`MongoDB connection close`),
 );
-mongoose.connection.on(`error`, () => {
-  console.log(`MongoDB connection error`);
+mongoose.connection.on(`error`, (e) => {
+  console.log(`MongoDB connection error`, e);
   process.exit();
 });
 
@@ -51,6 +53,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+//TODO Прикрутить аутентификацию базы
 app.use(
   session({
     secret: 'balance',
