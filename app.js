@@ -26,7 +26,6 @@ mongoose.Promise = global.Promise;
 //     ? process.env.MONGODB_URI || process.env.MONGOLAB_URI
 //     : process.env.MONGODB_URI_TEST;
 const dbPath = `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PWD}@${process.env.MONGO_PATH}:${process.env.MONGO_PORT}/${process.env.MONGO_BASE}?authSourse=${process.env.MONGO_BASE}`;
-console.log(dbPath);
 mongoose.connect(dbPath, {
   useNewUrlParser: true,
   useCreateIndex: true,
