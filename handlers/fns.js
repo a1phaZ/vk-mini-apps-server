@@ -23,9 +23,10 @@ checkAndReceive = async (req, res, next) => {
       await rp(opt)
         .then(response => {
           // res.locals.receiptAvailable = response.statusCode === 204;
-          console.log('check', {response, phone, password, fn, i, fp, dt, sum});
+          const {statusCode, body} = response;
+          console.log('check', {statusCode, body, phone, password, fn, i, fp, dt, sum});
           res.status(200).json({
-            statusCode: response.statusCode,
+            statusCode: statusCode,
             check: true
           });
         })
@@ -51,15 +52,16 @@ checkAndReceive = async (req, res, next) => {
 
       await rp(opt)
         .then(response => {
-          console.log('receive', {response, phone, password, fn, i, fp, dt, sum});
-          if (!response.body) {
+          const {statusCode, body} = response;
+          console.log('receive', {statusCode, body, phone, password, fn, i, fp, dt, sum});
+          if (body) {
             res.status(200).json({
               check: true,
-              statusCode: response.statusCode,
+              statusCode: statusCode,
               body: false
             });
-          } else if (response.body.document.receipt) {
-            const { dateTime, totalSum, items } = response.body.document.receipt;
+          } else if (body.document.receipt) {
+            const { dateTime, totalSum, items } = body.document.receipt;
             res.locals.receiptData = { dateTime, totalSum, items };
             next();
           }
