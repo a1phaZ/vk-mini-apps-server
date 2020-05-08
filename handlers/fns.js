@@ -10,6 +10,7 @@ checkAndReceive = async (req, res, next) => {
   } = req;
   //TODO Добавить проверку phone и password, если токен истек
   // Вывод ошибки с предложением авторизоваться снова
+
   let opt = {};
   switch (action) {
     case 'check':
@@ -22,13 +23,15 @@ checkAndReceive = async (req, res, next) => {
       await rp(opt)
         .then(response => {
           // res.locals.receiptAvailable = response.statusCode === 204;
+          console.log('check', {response, phone, password, fn, i, fp, dt, sum});
           res.status(200).json({
             statusCode: response.statusCode,
             check: true
           });
         })
         .catch(err => {
-          next(err)
+          console.log('check error', err);
+          res.status(err.statusCode || 200).json(err);
         });
       break;
     case 'receive':
@@ -48,6 +51,7 @@ checkAndReceive = async (req, res, next) => {
 
       await rp(opt)
         .then(response => {
+          console.log('receive', {response, phone, password, fn, i, fp, dt, sum});
           if (!response.body) {
             res.status(200).json({
               check: true,
@@ -61,7 +65,8 @@ checkAndReceive = async (req, res, next) => {
           }
         })
         .catch(err => {
-          next(err);
+          console.log('receive error', err);
+          res.status(err.statusCode || 200).json(err);
         });
       break;
     default:
@@ -93,7 +98,9 @@ password = async (req, res, next) => {
     )
     .catch(err => {
       //TODO обработка ошибок
-      next(err)
+      console.log('password error', err);
+      res.status(err.statusCode || 200).json(err);
+      // next(err)
     });
 };
 
