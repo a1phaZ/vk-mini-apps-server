@@ -54,7 +54,7 @@ checkAndReceive = async (req, res, next) => {
         .then(response => {
           const {statusCode, body} = response;
           console.log('receive', {statusCode, body, phone, password, fn, i, fp, dt, sum});
-          if (body) {
+          if (!body) {
             res.status(200).json({
               check: true,
               statusCode: statusCode,
