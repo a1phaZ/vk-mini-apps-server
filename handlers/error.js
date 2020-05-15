@@ -6,8 +6,10 @@ const createError = (statusCode, message) => {
 
 const handleError = (err , res) => {
   const { statusCode, status, message } = err;
+  res.status(statusCode || status || 500)
+  console.log(message);
   res.statusMessage = message;
-  res.status(statusCode || status || 500).send({
+  res.send({
     error: {
       status: 'error',
       statusCode,
