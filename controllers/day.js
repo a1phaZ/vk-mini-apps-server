@@ -150,7 +150,9 @@ checkReceipt = async (target, obj) => {
   if (target.length !== 0) {
     const [result] = await Promise.all([
       target.some(item => {
-
+        console.log('item.fn !== obj.fn ', item.fn !== obj.fn );
+        console.log('item.i !== obj.i', item.i !== obj.i);
+        console.log('item.fp !== obj.fp', item.fp !== obj.fp);
         return item.fn !== obj.fn && item.i !== obj.i && item.fp !== obj.fp;
       }),
     ]);
