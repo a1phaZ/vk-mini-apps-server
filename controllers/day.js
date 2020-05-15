@@ -92,12 +92,12 @@ exports.postDayByReceipt = async (req, res, next) => {
   } = res;
   if (receiptData) {
     const {
-      body: { fn, fd, fp },
+      body: { fn, i, fp },
       payload: { id },
     } = req;
     const rex = receiptData.dateTime.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}/);
     const d = new Date(rex);
-    const receiptToSave = { fn, fd, fp };
+    const receiptToSave = { fn, i, fp };
     const { dateTime, ...receiptdata } = receiptData;
     const query = { userId: id, dateTime: d };
     await Day.findOne(query)
