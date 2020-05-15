@@ -117,7 +117,6 @@ exports.postDayByReceipt = async (req, res, next) => {
           const { items } = receiptdata;
           await Day.findOne(query)
             .then(async day => {
-              console.log('day.receipts', day.receipts);
               if (await checkReceipt(day.receipts, receiptToSave)) {
                 console.log('Новый чек');
                 await Day.updateOne(query, {
@@ -157,8 +156,8 @@ checkReceipt = async (target, obj) => {
         return item.fn === obj.fn && item.i === obj.i && item.fp === obj.fp;
       }),
     ]);
-    console.log(result);
-    return result;
+    console.log(!result);
+    return !result;
   }
   return true;
 };
