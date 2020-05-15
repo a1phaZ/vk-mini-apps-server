@@ -57,7 +57,7 @@ router.post('/login', auth.optional, (req, res, next) => {
 
     console.log(info);
 
-    return res.status(400).json(info);
+    return next(createError(422, info.error.message));
   })(req, res, next);
 });
 
