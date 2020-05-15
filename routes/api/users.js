@@ -57,7 +57,7 @@ router.post('/login', auth.optional, (req, res, next) => {
 
     console.log(info);
 
-    return next(createError(422, info.error.message));
+    return next(createError(400, info.error.message));
   })(req, res, next);
 });
 
@@ -69,7 +69,7 @@ router.get('/profile', auth.required, (req, res, next) => {
   User.findById(id)
     .then(user => {
       if (!user) {
-        return res.sendStatus(400);
+        return next(createError(400, 'Пользователь не найден'));
       }
 
       return res.json({ user: user.toAuthJson() });
