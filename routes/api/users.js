@@ -55,6 +55,8 @@ router.post('/login', auth.optional, (req, res, next) => {
       return res.json({ user: user.toAuthJson() });
     }
 
+    console.log(info);
+
     return res.status(400).json(info);
   })(req, res, next);
 });
