@@ -8,7 +8,7 @@ const handleError = (err , res) => {
   const { statusCode, status, message } = err;
   res.status(statusCode || status || 500)
   console.log(message);
-  res.statusMessage = message;
+  res.statusMessage = 'Сообщение об ошибке';
   res.send({
     error: {
       status: 'error',
