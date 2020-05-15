@@ -6,7 +6,7 @@ const createError = (statusCode, message) => {
 
 const handleError = (err , res) => {
   const { statusCode, status, message } = err;
-  res.statusMessage(message);
+  res.statusMessage = message;
   res.status(statusCode || status || 500).send({
     error: {
       status: 'error',
