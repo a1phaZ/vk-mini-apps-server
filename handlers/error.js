@@ -10,7 +10,7 @@ const handleError = (err , res) => {
     error: {
       status: 'error',
       statusCode,
-      message,
+      statusMessage: message,
     },
   });
 };
