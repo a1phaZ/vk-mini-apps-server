@@ -1,3 +1,5 @@
+const {createError} = require('./error');
+
 const rp = require('request-promise');
 
 checkAndReceive = async (req, res, next) => {
@@ -68,7 +70,7 @@ checkAndReceive = async (req, res, next) => {
         })
         .catch(err => {
           console.log('receive error', err);
-          res.status(err.statusCode || 200).json(err);
+          res.status(err.statusCode || 200).json(createError(err.statusCode, err.message));
         });
       break;
     default:
