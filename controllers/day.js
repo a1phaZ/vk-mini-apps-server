@@ -132,7 +132,10 @@ exports.postDayByReceipt = async (req, res, next) => {
             .catch(err => next(err));
         }
       })
-      .catch(err => next(err));
+      .catch(err => {
+        console.log(err);
+        next(err)
+      });
   } else {
     await res.status(404).json({
       message: 'Чек не был найден',
