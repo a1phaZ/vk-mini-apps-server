@@ -24,7 +24,7 @@ checkAndReceive = async (req, res, next) => {
         .then(response => {
           // res.locals.receiptAvailable = response.statusCode === 204;
           const {statusCode, body} = response;
-          console.log('check', {statusCode, body, phone, password, fn, i, fp, dt, sum});
+          // console.log('check', {statusCode, body, phone, password, fn, i, fp, dt, sum});
           res.status(200).json({
             statusCode: statusCode,
             check: true
@@ -53,7 +53,7 @@ checkAndReceive = async (req, res, next) => {
       await rp(opt)
         .then(response => {
           const {statusCode, body} = response;
-          console.log('receive', {statusCode, body, phone, password, fn, i, fp, dt, sum});
+          // console.log('receive', {statusCode, body, phone, password, fn, i, fp, dt, sum});
           if (!body) {
             res.status(200).json({
               check: true,
