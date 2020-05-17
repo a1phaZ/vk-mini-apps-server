@@ -25,7 +25,7 @@ checkAndReceive = async (req, res, next) => {
       await rp(opt)
         .then(response => {
           // res.locals.receiptAvailable = response.statusCode === 204;
-          const {statusCode, body} = response;
+          const {statusCode} = response;
           // console.log('check', {statusCode, body, phone, password, fn, i, fp, dt, sum});
           res.status(200).json({
             statusCode: statusCode,
@@ -33,8 +33,9 @@ checkAndReceive = async (req, res, next) => {
           });
         })
         .catch(err => {
-          console.log('check error', err);
-          res.status(err.statusCode || 200).json(err);
+          // console.log('check error', err);
+          // res.status(err.statusCode || 200).json(err);
+          return next(createError(err.statusCode, err.message));
         });
       break;
     case 'receive':
@@ -105,8 +106,9 @@ password = async (req, res, next) => {
     )
     .catch(err => {
       //TODO обработка ошибок
-      console.log('password error', err);
-      res.status(err.statusCode || 200).json(err);
+      // console.log('password error', err);
+      // res.status(err.statusCode || 200).json(err);
+      return next(createError(err.statusCode, err.message));
       // next(err)
     });
 };
