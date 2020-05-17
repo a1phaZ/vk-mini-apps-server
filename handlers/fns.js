@@ -69,8 +69,10 @@ checkAndReceive = async (req, res, next) => {
           }
         })
         .catch(err => {
-          console.log('receive error', err);
-          res.status(err.statusCode || 200).json(createError(err.statusCode, err.message));
+          // console.log('receive error', err);
+          const error = createError(err.statusCode, err.message);
+          console.log('receive error', error);
+          res.status(err.statusCode || 200).json(error);
         });
       break;
     default:
