@@ -112,7 +112,6 @@ exports.postDayByReceipt = async (req, res, next) => {
           await newDay
             .save()
             .then(item => res.status(200).json(item))
-            .catch(err => next(err));
         } else {
           const { items } = receiptdata;
           await Day.findOne(query)
@@ -129,7 +128,6 @@ exports.postDayByReceipt = async (req, res, next) => {
                 return next(createError(409, 'Данный чек уже добавлен'));
               }
             })
-            .catch(err => next(err));
         }
       })
       .catch(err => {
