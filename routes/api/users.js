@@ -31,6 +31,7 @@ router.post('/register', auth.optional, (req, res, next) => {
 });
 
 router.post('/login', auth.optional, (req, res, next) => {
+  console.log(req.body);
   const {
     body: { user }
   } = req;
