@@ -22,11 +22,10 @@ const catalog = async (req, res, next) => {
 						.reduce((uniq, item) => {
 							return uniq.includes(item) ? uniq : [ ...uniq, item ];
 						}, [])
-						.map(item => {
-							Catalog.updateMany({userId: id, name: item}, { $set: {name: item} }, {upsert: true})
-								.then(() => res.json({ message: 'Успех' }))
-								.catch(e => next(e));
+						.map(async item => {
+							await Catalog.updateOne({userId: id, name: item}, { $set: {name: item} }, {upsert: true});
 						});
+					await res.json({ message: 'Успех' });
 				})
 				.catch(err => next(err));
 			break;
@@ -45,6 +44,9 @@ const catalog = async (req, res, next) => {
 
 const updateCatalog = async (req, res, next) => {
 	const { payload: { id }, body: {update}} = req;
+	await update.map((item) => {
+
+	})
 	await Catalog.updateMany({userId: id, name: update.name}, { $set: update }, { new: true })
 		.then(response => res.json({ response: response }))
 		.catch(err => next(err));
