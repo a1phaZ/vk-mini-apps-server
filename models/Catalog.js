@@ -4,12 +4,8 @@ mongoose.Promise = global.Promise;
 
 const CatalogSchema = new Schema({
 	userId: { type: Schema.Types.ObjectId },
-	items: [
-		{
-			name: { type: String },
-			definition: {type: String},
-		}
-	]
+	name: { type: String },
+	definition: {type: String},
 });
 
 const Catalog = model('Catalog', CatalogSchema);
