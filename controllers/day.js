@@ -1,24 +1,6 @@
 const Day = require('../models/Day');
+const Catalog = require('../models/Catalog');
 const { createError } = require('../handlers/error');
-
-exports.getDay = (req, res, next) => {
-  const {
-    params: { day, month, year },
-    payload: { id },
-  } = req;
-  const d = prepareDate(day, month, year);
-  Day.findOne({ userId: id, dateTime: d })
-    .then(day => {
-      if (!day) {
-        res
-          .status(404)
-          .json({ message: 'Доходов/раходов в этот день не было' });
-      } else {
-        res.status(200).json(day);
-      }
-    })
-    .catch(err => next(err));
-};
 
 exports.getDays = (req, res, next) => {
   const {
@@ -31,10 +13,13 @@ exports.getDays = (req, res, next) => {
     dateTime: {$gte: dateRange.startDate, $lte: dateRange.endDate}
   })
     .sort({ dateTime: 1 })
+    .populate({path: 'items.definition', select: 'definition'})
     .then(days => {
       res.status(200).json(days)
     })
-    .catch(err => next(err));
+    .catch(() => {
+      next(createError(500, 'Ошибка со стороны базы данных'))
+    });
 };
 
 exports.postDay = async (req, res, next) => {
@@ -48,7 +33,9 @@ exports.postDay = async (req, res, next) => {
         const newDay = new Day({
           userId: id,
           dateTime: date,
-          items,
+          items: await writeItemsFromCatalog([...items], id).then(res => res.map((item => {
+            return item.value;
+          }))),
         });
         newDay
           .save()
@@ -57,31 +44,20 @@ exports.postDay = async (req, res, next) => {
           })
           .catch(err => next(err));
       } else {
+        const array = await writeItemsFromCatalog([...day.items, ...items], id).then(res => res.map((item => {
+          return item.value;
+        })));
+
+        // await Day.findOneAndUpdate({ userId: id, dateTime: date }, {items: array})
         await Day.updateOne(
           { userId: id, dateTime: date },
-          { $push: { items: items } },
+          { $set: { items: array } },
         ).then(async () => {
           await Day.findOne({ userId: id, dateTime: date }).then(day => {
             return res.status(200).json(day);
           });
         });
       }
-    })
-    .catch(err => next(err));
-};
-
-exports.updateDay = async (req, res, next) => {
-  const {
-    params: { day, month, year },
-    payload: { id },
-    body: { items },
-  } = req;
-  const d = prepareDate(day, month, year);
-  await Day.updateOne({ userId: id, dateTime: d }, { $push: { items: items } })
-    .then(async () => {
-      await Day.findOne({ userId: id, dateTime: d }).then(day => {
-        return res.status(200).json(day);
-      });
     })
     .catch(err => next(err));
 };
@@ -114,11 +90,15 @@ exports.postDayByReceipt = async (req, res, next) => {
             .then(item => res.status(200).json(item))
         } else {
           const { items } = receiptdata;
-          await Day.findOne(query)
-            .then(async day => {
+          // await Day.findOne(query)
+          //   .then(async day => {
+          //TODO Need tests!!!
               if (await checkReceipt(day.receipts, receiptToSave)) {
+                const array = await writeItemsFromCatalog([...day.items, ...items], id).then(res => res.map((item => {
+                  return item.value;
+                })));
                 await Day.updateOne(query, {
-                  $push: { items: items, receipts: receiptToSave },
+                  $set: { items: array, receipts: [...day.receipts, receiptToSave] },
                 }).then(async () => {
                   await Day.findOne(query).then(day => {
                     return res.status(200).json(day);
@@ -127,7 +107,7 @@ exports.postDayByReceipt = async (req, res, next) => {
               } else {
                 return next(createError(409, 'Данный чек уже добавлен'));
               }
-            })
+            // })
         }
       })
       .catch(err => {
@@ -157,6 +137,15 @@ checkReceipt = async (target, obj) => {
   }
   return true;
 };
+
+writeItemsFromCatalog = async (array, id) => {
+  const mappedArray = await array.map(async (item) => {
+    const cItem = await Catalog.findOne({userId: id, name: item.name});
+    item.definition = cItem && cItem._id;
+    return item;
+  })
+  return await Promise.allSettled(mappedArray).then(res => res);
+}
 
 prepareDateRange = (date) => {
   const currentDate = new Date(date);

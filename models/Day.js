@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
+
 mongoose.Promise = global.Promise;
 
 const DaySchema = new mongoose.Schema({
@@ -9,6 +10,8 @@ const DaySchema = new mongoose.Schema({
   items: [
     {
       name: { type: String },
+      //definition: { type: String },
+      definition: { type: Schema.Types.ObjectId, ref: 'Catalog' },
       quantity: { type: Number },
       price: { type: Number },
       sum: { type: Number },
@@ -20,35 +23,31 @@ const DaySchema = new mongoose.Schema({
   receipts: [Schema.Types.Mixed],
 });
 
-DaySchema.pre('save', function save(next) {
-  const day = this;
+const calcSum = (array) => {
   let totalSum = 0;
-  day.items.forEach(item => {
+  array.forEach(async item => {
     if (item.income) {
       totalSum += item.sum;
     } else {
       totalSum -= item.sum;
     }
   });
-  day.totalSum = totalSum;
+  return totalSum;
+}
+
+DaySchema.pre('save', async function save(next) {
+  const day = this;
+  day.totalSum = calcSum(day.items);
   next();
 });
 
 DaySchema.pre('updateOne', async function updateOne(next) {
   const day = this;
-  const docToUpdate = await day.model.findOne(day.getQuery());
-  const { items } = day._update.$push;
-  let totalSum = 0;
-  const sumArray = [...docToUpdate.items, ...items];
-  sumArray.forEach(item => {
-    if (item.income) {
-      totalSum += item.sum;
-    } else {
-      totalSum -= item.sum;
-    }
-  });
-
-  day.set({ totalSum: totalSum });
+  // const docToUpdate = await day.model.findOne(day.getQuery());
+  const { items } = day._update.$set;
+  const sumArray = [...items];
+  const totalSum = calcSum(sumArray);
+  day.set({totalSum: totalSum});
   next();
 });
 
