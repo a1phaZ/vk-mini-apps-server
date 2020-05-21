@@ -44,12 +44,10 @@ const catalog = async (req, res, next) => {
 
 const updateCatalog = async (req, res, next) => {
 	const { payload: { id }, body: {update}} = req;
-	await update.map((item) => {
-
+	await update.map(async (item) => {
+		await Catalog.updateOne({userId: id, name: item.name}, { $set: {...item} }, {upsert: true}).catch(e => next(e));
 	})
-	await Catalog.updateMany({userId: id, name: update.name}, { $set: update }, { new: true })
-		.then(response => res.json({ response: response }))
-		.catch(err => next(err));
+	await res.json({ message: 'Успех' });
 }
 
 module.exports = {
