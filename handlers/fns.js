@@ -139,7 +139,10 @@ checkAndReceive = async (req, res, next) => {
       }
     })
     .then(receipt => {
-      console.log('Data: ', receipt.data.document);
+      console.log('Получение данных: ');
+      console.log('receipt', receipt);
+      console.log('receipt.data', receipt.data)
+      console.log('receipt.data.document: ', receipt.data.document);
       const { dateTime, totalSum, items } = receipt.data.document.receipt;
       res.locals.receiptData = { dateTime, totalSum, items };
       next();
