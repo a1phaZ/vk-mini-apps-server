@@ -126,17 +126,21 @@ checkAndReceive = async (req, res, next) => {
 
   await getCheck()
     .then(async () => {
+      console.log('Чек валидный. Первая попытка расшифровки');
       return await getReceipt()
     })
     .then(async (data) => {
       if (!data.data) {
+        console.log('Расшифровка не получена. Вторая попытка', 'data.data', !!data.data);
         return await getReceipt();
       } else {
+        console.log('Расшифровка получена. Возвращаем данные', 'data.data', !!data.data);
         return data;
       }
     })
     .then(async receipt => {
-      const { dateTime, totalSum, items } = await receipt.data.document.receipt;
+      console.log('Data: ', receipt.data.document);
+      const { dateTime, totalSum, items } = receipt.data.document.receipt;
       res.locals.receiptData = { dateTime, totalSum, items };
       next();
     })
