@@ -92,8 +92,6 @@ checkAndReceive = async (req, res, next) => {
     body: { fn, i, fp, dt, sum },
   } = req;
 
-  console.log(phone, password, fn, i, fp, dt, sum);
-
   const auth =
     'Basic ' + new Buffer(phone.replace(/[ ()-]/g, '') + ':' + password).toString('base64');
 
@@ -128,24 +126,18 @@ checkAndReceive = async (req, res, next) => {
 
   await getCheck()
     .then(async () => {
-      console.log({check: true})
       return await getReceipt()
     })
     .then(async (data) => {
-      console.log({check: true, data: data.data})
       if (!data.data) {
-        console.log('data 1', !!data);
         return await getReceipt();
       } else {
-        console.log('data 2', !!data);
         return data;
       }
     })
     .then(async receipt => {
-      console.log({check: true, receipt: receipt.data})
       const { dateTime, totalSum, items } = await receipt.data.document.receipt;
       res.locals.receiptData = { dateTime, totalSum, items };
-      // return res.json(receipt.data)
       next();
     })
     .catch(err => {
