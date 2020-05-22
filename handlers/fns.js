@@ -138,7 +138,7 @@ checkAndReceive = async (req, res, next) => {
         return data;
       }
     })
-    .then(async receipt => {
+    .then(receipt => {
       console.log('Data: ', receipt.data.document);
       const { dateTime, totalSum, items } = receipt.data.document.receipt;
       res.locals.receiptData = { dateTime, totalSum, items };
