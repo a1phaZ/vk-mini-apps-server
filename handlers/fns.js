@@ -117,6 +117,7 @@ checkAndReceive = async (req, res, next) => {
           Authorization: auth,
           'device-id': '',
           'device-os': '',
+          'Cache-Control': 'no-cache'
         },
       })
     } catch (e) {
@@ -138,14 +139,10 @@ checkAndReceive = async (req, res, next) => {
         return data;
       }
     })
-    .then(data => {
-      console.log('data.data', data.data);
-      return data.data;
-    })
     .then(receipt => {
       console.log('Получение данных: ');
-      console.log('receipt.document: ', receipt.document);
-      const { dateTime, totalSum, items } = receipt.document.receipt;
+      console.log('receipt.document: ', receipt.data.document);
+      const { dateTime, totalSum, items } = receipt.data.document.receipt;
       res.locals.receiptData = { dateTime, totalSum, items };
       next();
     })
