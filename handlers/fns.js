@@ -116,8 +116,7 @@ checkAndReceive = async (req, res, next) => {
         headers: {
           Authorization: auth,
           'device-id': '',
-          'device-os': '',
-          'Cache-Control': 'no-cache'
+          'device-os': ''
         },
       })
     } catch (e) {
@@ -133,7 +132,7 @@ checkAndReceive = async (req, res, next) => {
     .then(async (data) => {
       if (!data.data) {
         console.log('Расшифровка не получена. Вторая попытка', 'data.data', !!data.data);
-        return await getReceipt();
+        return setTimeout(await getReceipt(), 1000);
       } else {
         console.log('Расшифровка получена. Возвращаем данные', 'data.data', !!data.data);
         return data;
