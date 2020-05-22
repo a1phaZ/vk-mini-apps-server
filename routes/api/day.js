@@ -9,6 +9,6 @@ const auth = require("../../handlers/auth");
 
 router.get('/', auth.required, getDays);
 router.post('/', auth.required, postDay);
-router.post('/receipt', auth.optional, fns.checkAndReceive, postDayByReceipt);
+router.post('/receipt', auth.required, fns.checkAndReceive, postDayByReceipt);
 
 module.exports = router;
