@@ -133,7 +133,7 @@ checkAndReceive = async (req, res, next) => {
       if (!data.data) {
         console.log('Расшифровка не получена. Вторая попытка', 'data.data', !!data.data);
         return await getReceipt().then(data => {console.log(data); return data}).catch(err => {
-          console.log(e);
+          console.log(err);
           next(createError(err.statusCode, err.message))
         });
       } else {
@@ -149,7 +149,7 @@ checkAndReceive = async (req, res, next) => {
       next();
     })
     .catch(err => {
-      console.log(e);
+      console.log(err);
       next(createError(err.statusCode, err.message))
     });
 }
