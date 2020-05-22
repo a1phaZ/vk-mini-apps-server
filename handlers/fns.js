@@ -132,7 +132,10 @@ checkAndReceive = async (req, res, next) => {
     .then(async (data) => {
       if (!data.data) {
         console.log('Расшифровка не получена. Вторая попытка', 'data.data', !!data.data);
-        return setTimeout(await getReceipt(), 1000);
+        return await getReceipt().then(data => {console.log(data); return data}).catch(err => {
+          console.log(e);
+          next(createError(err.statusCode, err.message))
+        });
       } else {
         console.log('Расшифровка получена. Возвращаем данные', 'data.data', !!data.data);
         return data;
@@ -146,6 +149,7 @@ checkAndReceive = async (req, res, next) => {
       next();
     })
     .catch(err => {
+      console.log(e);
       next(createError(err.statusCode, err.message))
     });
 }
