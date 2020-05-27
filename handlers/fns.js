@@ -123,7 +123,7 @@ checkAndReceive = async (req, res, next) => {
         headers: {
           Authorization: auth,
           'device-id': '',
-          'device-os': '',
+          'device-os': ''
         },
       })
     } catch (e) {
@@ -142,21 +142,29 @@ checkAndReceive = async (req, res, next) => {
 
   await getCheck()
     .then(async () => {
+      console.log('Чек валидный. Первая попытка расшифровки');
       return await getReceipt()
     })
     .then(async (data) => {
       if (!data.data) {
-        return await getReceipt();
+        console.log('Расшифровка не получена. Вторая попытка', 'data.data', !!data.data);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        console.log('Отработала выдержка времени');
+        return await getReceipt()
       } else {
+        console.log('Расшифровка получена. Возвращаем данные', 'data.data', !!data.data);
         return data;
       }
     })
-    .then(async receipt => {
-      const { dateTime, totalSum, items } = await receipt.data.document.receipt;
+    .then(receipt => {
+      console.log('Получение данных: ');
+      console.log('receipt.document: ', receipt.data.document);
+      const { dateTime, totalSum, items } = receipt.data.document.receipt;
       res.locals.receiptData = { dateTime, totalSum, items };
       next();
     })
     .catch(err => {
+      console.log(err);
       next(createError(err.statusCode, err.message))
     });
 }
