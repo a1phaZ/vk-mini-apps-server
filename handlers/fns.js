@@ -106,7 +106,14 @@ checkAndReceive = async (req, res, next) => {
     try {
       return await instance.get(`https://proverkacheka.nalog.ru:9999/v1/ofds/*/inns/*/fss/${fn}/operations/1/tickets/${i}?fiscalSign=${fp}&date=${dt}&sum=${sum}`);
     } catch (e) {
-      throw new Error(e);
+      switch (e.statusCode) {
+        case 406:
+          throw new Error('Чек не найден в БД ФНС, возможно чек не валидный. Повторите попытку позже либо ввелите данные вручную.');
+        case 400:
+          throw new Error('Не указан параметр дата/сумма. Повторите попытку позже либо ввелите данные вручную.');
+        default:
+          throw new Error(e);
+      }
     }
   }
 
@@ -120,7 +127,16 @@ checkAndReceive = async (req, res, next) => {
         },
       })
     } catch (e) {
-      throw new Error(e);
+      switch (e.statusCode) {
+        case 403:
+          throw new Error('Ошибка авторизации на сервере ФНС. Проверьте правильность телефона и/или пароля и повторите попытку.');
+        case 400:
+          throw new Error('Непредвиденная ошибка на сервере ФНС. Повторите попытку позже либо введите данные вручную.');
+        case 500:
+          throw new Error('Непредвиденная ошибка на сервере ФНС. Повторите попытку позже либо введите данные вручную.');
+        default:
+          throw new Error('Чек валидный, но расшифровка не найдена на сервере ФНС. Повторите попытку позже либо введите данные вручную.');
+      }
     }
   }
 
@@ -161,16 +177,23 @@ password = async (req, res, next) => {
   await rp(opt)
     .then(() => {
         res.status(200).json({
-          message: `На телефон ${body.phone} отправлено сообщение с паролем`,
+          message: `На телефон ${body.phone} отправлено сообщение с паролем.`,
         });
       }
     )
     .catch(err => {
-      //TODO обработка ошибок
-      // console.log('password error', err);
-      // res.status(err.statusCode || 200).json(err);
-      return next(createError(err.statusCode, err.message));
-      // next(err)
+      switch (err.statusCode) {
+        case 409:
+          return next(createError(err.statusCode, 'Пользователь уже существует.'));
+        case 500:
+          return next(createError(err.statusCode, 'Некоректный номер телефона, проверьте правильность и повторите попытку.'));
+        case 400:
+          return next(createError(err.statusCode, 'Некоректный адрес электронной почты, проверьте правильность и повторите попытку.'));
+        case 404:
+          return next(createError(err.statusCode, 'Пользователя не существует.'));
+        default:
+          throw new Error('Непредвиденная ошибка на сервере ФНС. Повторите попытку позже.');
+      }
     });
 };
 
