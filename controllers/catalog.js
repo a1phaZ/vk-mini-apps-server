@@ -46,8 +46,13 @@ const updateCatalog = async (req, res, next) => {
 	const { payload: { id }, body: {update}} = req;
 	await update.map(async (item) => {
 		await Catalog.updateOne({userId: id, name: item.name}, { $set: {...item} }, {upsert: true}).catch(e => next(e));
-	})
-	await res.json({ message: 'Успех' });
+	});
+	await Catalog.find({userId: id})
+		.then(async response => {
+			if (!response) await res.json([]);
+			await res.json(response);
+		})
+		.catch(err => next(err));
 }
 
 module.exports = {
