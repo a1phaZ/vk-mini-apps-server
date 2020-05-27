@@ -157,11 +157,15 @@ checkAndReceive = async (req, res, next) => {
       }
     })
     .then(receipt => {
-      console.log('Получение данных: ');
-      console.log('receipt.document: ', receipt.data.document);
-      const { dateTime, totalSum, items } = receipt.data.document.receipt;
-      res.locals.receiptData = { dateTime, totalSum, items };
-      next();
+      try {
+        console.log('Получение данных: ');
+        console.log('receipt.document: ', receipt.data.document);
+        const { dateTime, totalSum, items } = receipt.data.document.receipt;
+        res.locals.receiptData = { dateTime, totalSum, items };
+        next();
+      } catch (e) {
+        throw new Error('Чек валидный, но расшифровка не найдена на сервере ФНС. Повторите попытку позже либо введите данные вручную.');
+      }
     })
     .catch(err => {
       console.log(err);
