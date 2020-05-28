@@ -79,7 +79,7 @@ exports.postDayByReceipt = async (req, res, next) => {
     await Day.findOne(query)
       .then(async day => {
         if (!day) {
-          const array = await writeItemsFromCatalog(receiptdata, id).then(res => res.map((item => item.value)));
+          const array = await writeItemsFromCatalog(receiptdata.items, id).then(res => res.map((item => item.value)));
           const newDay = new Day({
             userId: id,
             dateTime: d,
