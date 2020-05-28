@@ -97,6 +97,7 @@ exports.postDayByReceipt = async (req, res, next) => {
                 const array = await writeItemsFromCatalog([...day.items, ...items], id).then(res => res.map((item => {
                   return item.value;
                 })));
+                console.log('array', array);
                 await Day.updateOne(query, {
                   $set: { items: array, receipts: [...day.receipts, receiptToSave] },
                 }).then(async () => {
