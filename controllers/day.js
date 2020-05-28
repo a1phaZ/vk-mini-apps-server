@@ -12,7 +12,7 @@ exports.getDays = (req, res, next) => {
     userId: id,
     dateTime: {$gte: dateRange.startDate, $lte: dateRange.endDate}
   })
-    .sort({ dateTime: 1 })
+    .sort({ dateTime: -1 })
     .populate({path: 'items.definition', select: 'definition'})
     .then(days => {
       res.status(200).json(days)
