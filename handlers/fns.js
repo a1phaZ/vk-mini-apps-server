@@ -146,7 +146,6 @@ checkAndReceive = async (req, res, next) => {
       return await getReceipt()
     })
     .then(async (data) => {
-      console.log('data.data', data.data);
       if (!data.data) {
         console.log('Расшифровка не получена. Вторая попытка', 'data.data', !!data.data);
         await new Promise((resolve) => setTimeout(resolve, 1000));
