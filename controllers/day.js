@@ -79,7 +79,7 @@ exports.postDayByReceipt = async (req, res, next) => {
     await Day.findOne(query)
       .then(async day => {
         if (!day) {
-          const array = await writeItemsFromCatalog([...receiptdata], id).then(res => res.map((item => item.value)));
+          const array = await writeItemsFromCatalog(receiptdata, id).then(res => res.map((item => item.value)));
           const newDay = new Day({
             userId: id,
             dateTime: d,
@@ -140,6 +140,7 @@ checkReceipt = async (target, obj) => {
 };
 
 writeItemsFromCatalog = async (array, id) => {
+  console.log('array', array);
   const mappedArray = await array.map(async (item) => {
     await Catalog.updateOne({userId: id, name: item.name}, { $set: {name: item.name} }, {upsert: true})
     const cItem = await Catalog.findOne({userId: id, name: item.name});
