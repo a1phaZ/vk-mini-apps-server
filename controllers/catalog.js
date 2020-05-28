@@ -30,7 +30,7 @@ const catalog = async (req, res, next) => {
 				.catch(err => next(err));
 			break;
 		case 'get':
-			await Catalog.find({userId: id})
+			await Catalog.find({userId: id}).sort({definition: 1})
 				.then(response => {
 					if (!response) res.json([]);
 					res.json(response);
@@ -47,7 +47,7 @@ const updateCatalog = async (req, res, next) => {
 	await update.map(async (item) => {
 		await Catalog.updateOne({userId: id, name: item.name}, { $set: {...item} }, {upsert: true}).catch(e => next(e));
 	});
-	await Catalog.find({userId: id})
+	await Catalog.find({userId: id}).sort({definition: 1})
 		.then(async response => {
 			if (!response) await res.json([]);
 			await res.json(response);
