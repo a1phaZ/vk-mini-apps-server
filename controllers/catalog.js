@@ -44,10 +44,11 @@ const catalog = async (req, res, next) => {
 
 const updateCatalog = async (req, res, next) => {
 	const { payload: { id }, body: {update}} = req;
-	await update.map(async (item) => {
-		await Catalog.updateOne({userId: id, name: item.name}, { $set: {...item} }, {upsert: true}).catch(e => next(e));
+	const updateResult = await update.map(async (item) => {
+		return await Catalog.updateOne({userId: id, name: item.name}, {$set: {...item}}, {upsert: true});
 	});
-	await Catalog.find({userId: id}).sort({definition: 1})
+	Promise.all(updateResult)
+		.then(() => Catalog.find({userId: id}).sort({definition: 1}))
 		.then(async response => {
 			if (!response) await res.json([]);
 			await res.json(response);
