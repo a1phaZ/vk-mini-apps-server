@@ -92,8 +92,14 @@ checkAndReceive = async (req, res, next) => {
     body: { fn, i, fp, dt, sum },
   } = req;
 
-  const auth =
-    'Basic ' + new Buffer(phone.replace(/[ ()-]/g, '') + ':' + password).toString('base64');
+  let auth;
+  try {
+    auth =
+      'Basic ' + new Buffer(phone.replace(/[ ()-]/g, '') + ':' + password).toString('base64');
+  } catch (e) {
+    throw new Error('Ошибка получения телефона из БД. Проверьте профиль и/или отчистите кеш приложения и повторите попытку');
+  }
+
 
   const instance = axios.create({
     httpsAgent: new https.Agent({
