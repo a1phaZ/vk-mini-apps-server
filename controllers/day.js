@@ -145,7 +145,6 @@ checkReceipt = async (target, obj) => {
 };
 
 writeItemsFromCatalog = async (array, id) => {
-  console.log('array', array);
   const mappedArray = await array.map(async (item) => {
     await Catalog.updateOne({userId: id, name: item.name}, { $set: {name: item.name} }, {upsert: true})
     const cItem = await Catalog.findOne({userId: id, name: item.name});
