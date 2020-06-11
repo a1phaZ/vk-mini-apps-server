@@ -112,11 +112,12 @@ checkAndReceive = async (req, res, next) => {
     try {
       return await instance.get(`https://proverkacheka.nalog.ru:9999/v1/ofds/*/inns/*/fss/${fn}/operations/1/tickets/${i}?fiscalSign=${fp}&date=${dt}&sum=${sum}`);
     } catch (e) {
+      console.log('getCheck', e.statusCode, e.message);
       switch (e.statusCode) {
         case 406:
-          throw new Error('Чек не найден в БД ФНС, возможно чек не валидный. Повторите попытку позже либо ввелите данные вручную.');
+          throw new Error('Чек не найден в БД ФНС, возможно чек не валидный. Повторите попытку позже либо введите данные вручную.');
         case 400:
-          throw new Error('Не указан параметр дата/сумма. Повторите попытку позже либо ввелите данные вручную.');
+          throw new Error('Не указан параметр дата/сумма. Повторите попытку позже либо введите данные вручную.');
         default:
           throw new Error(e);
       }
@@ -134,6 +135,7 @@ checkAndReceive = async (req, res, next) => {
       })
     } catch (e) {
       switch (e.statusCode) {
+        console.log('getReceipt', e.statusCode, e.message);
         case 403:
           throw new Error('Ошибка авторизации на сервере ФНС. Проверьте правильность телефона и/или пароля и повторите попытку.');
         case 400:
@@ -165,7 +167,6 @@ checkAndReceive = async (req, res, next) => {
     .then(receipt => {
       try {
         console.log('Получение данных: ');
-        console.log('receipt.document: ', receipt.data.document);
         const { dateTime, totalSum, items } = receipt.data.document.receipt;
         res.locals.receiptData = { dateTime, totalSum, items };
         next();
