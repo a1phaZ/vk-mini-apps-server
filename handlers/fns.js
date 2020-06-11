@@ -134,8 +134,8 @@ checkAndReceive = async (req, res, next) => {
         },
       })
     } catch (e) {
+      console.log('getReceipt', e.statusCode, e.message);
       switch (e.statusCode) {
-        console.log('getReceipt', e.statusCode, e.message);
         case 403:
           throw new Error('Ошибка авторизации на сервере ФНС. Проверьте правильность телефона и/или пароля и повторите попытку.');
         case 400:
