@@ -69,7 +69,7 @@ router.get('/profile', auth.required, (req, res, next) => {
   User.findById(id)
     .then(user => {
       if (!user) {
-        return next(createError(400, 'Пользователь не найден'));
+        return next(createError(404, 'Пользователь не найден'));
       }
 
       return res.json({ user: user.toAuthJson() });
@@ -83,8 +83,32 @@ router.put('/profile', auth.required, async (req, res, next) => {
     body: { update },
   } = req;
 
-  await User.findOneAndUpdate({_id: id}, { $set: update }, { new: true })
-    .then(user => res.json({ user: user.toAuthJson() }))
+  await User.updateOne({_id: id}, {$set: update}, {upsert: true})
+    .then(async () => {
+      return User.findOne({_id: id});
+    })
+    .then(async (user) => {
+      return await res.json({user: user.toAuthJson()});
+    })
+    .catch(err => next(err));
+
+  // await User.findOneAndUpdate({_id: id}, { $set: update }, { new: true })
+  //   .then(user => {
+  //     console.log(user);
+  //     res.json({user: user.toAuthJson()});
+  //   })
+  //   .catch(err => next(err));
+});
+
+router.get('/find', auth.optional, async (req, res, next) => {
+  const {
+    query: { id }
+  } = req;
+  await User.findOne({id})
+    .then((user) => {
+      if (!user) res.json({result: false, message: 'Пользователь не найден'});
+      res.json({result: true, message: 'Пользователь найден'});
+    })
     .catch(err => next(err));
 });
 
