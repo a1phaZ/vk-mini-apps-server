@@ -2,20 +2,20 @@ const Day = require('../models/Day');
 const Catalog = require('../models/Catalog');
 const { createError } = require('../handlers/error');
 
-exports.getDays = (req, res, next) => {
+exports.getDays = async (req, res, next) => {
   const {
     payload: { id },
     query,
   } = req;
   const dateRange = prepareDateRange(query.date);
-  Day.find({
+  await Day.find({
     userId: id,
     dateTime: {$gte: dateRange.startDate, $lte: dateRange.endDate}
   })
     .sort({ dateTime: -1 })
     .populate({path: 'items.definition', select: 'definition'})
     .then(days => {
-      res.status(200).json(days)
+      return res.status(200).json(days)
     })
     .catch(() => {
       next(createError(500, 'Ошибка со стороны базы данных'))
