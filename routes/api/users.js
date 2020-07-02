@@ -36,11 +36,11 @@ router.post('/login', auth.optional, (req, res, next) => {
   } = req;
 
   if (!user.id) {
-    return next(createError(422, 'id is required'));
+	  return next(createError(422, 'Отсутствует идентификатор пользователя'));
   }
 
   if (!user.password) {
-    return next(createError(422, 'password is required'));
+    return next(createError(422, 'Неверный пароль или пароль отсутствует'));
   }
 
   return passport.authenticate('local', {session: false}, (err, passportUser, info)=> {
