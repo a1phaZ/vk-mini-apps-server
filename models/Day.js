@@ -18,6 +18,7 @@ const DaySchema = new mongoose.Schema({
       income: { type: Boolean },
       modifiers: [Schema.Types.Mixed],
       properties: [Schema.Types.Mixed],
+      canDelete: {type: Boolean, default: false}
     },
   ],
   receipts: [Schema.Types.Mixed],
@@ -50,6 +51,12 @@ DaySchema.pre('updateOne', async function updateOne(next) {
   day.set({totalSum: totalSum});
   next();
 });
+
+DaySchema.pre('findOneAndUpdate', async function findOneAndUpdate(next) {
+  const day = this;
+  console.log(day);
+  next();
+})
 
 const Day = model('Day', DaySchema);
 

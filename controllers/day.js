@@ -42,7 +42,10 @@ exports.postDay = async (req, res, next) => {
           .then(day => {
             return res.status(200).json(day);
           })
-          .catch(err => next(err));
+          .catch(err => {
+            console.log(err);
+            next(err)
+          });
       } else {
         const array = await writeItemsFromCatalog([...day.items, ...items], id).then(res => res.map((item => {
           return item.value;
@@ -59,7 +62,10 @@ exports.postDay = async (req, res, next) => {
         });
       }
     })
-    .catch(err => next(err));
+    .catch(err => {
+      console.log(err);
+      next(err)
+    });
 };
 
 exports.postDayByReceipt = async (req, res, next) => {
@@ -126,6 +132,58 @@ exports.postDayByReceipt = async (req, res, next) => {
     });
   }
 };
+
+exports.editDayItem = async (req, res, next) => {
+  const {
+    body,
+    payload: {id}
+  } = req;
+  const [editedItem] = body.items;
+  await Day.findOne({
+      userId: id,
+      'items._id': body.id
+    })
+    .then(day => {
+      return day.items;
+    })
+    .then(items => {
+      const array = [...items];
+      const index = array.findIndex((item) => {
+        return item._id.toString() === body.id.toString()
+      });
+      array[index] = {...editedItem}
+      console.log(array);
+      return array;
+    })
+    .then(async (array) => {
+      return await Day.updateOne({
+        userId: id,
+        'items._id': body.id
+      }, { $set: {items: array}}, { new: true })
+    })
+    .then((updatedDay) => {
+      res.status(200).json(updatedDay);
+    })
+    .catch(err => next(err));
+}
+
+// {
+//   date: '2020-07-02',
+//     items: [
+//       {
+//         name: 'Остаток',
+//         quantity: '12',
+//         price: 10000000,
+//         sum: 120000000,
+//         income: true,
+//         modifiers: [],
+//         properties: [],
+//         canDelete: true,
+//         canEditDate: true
+//       }
+//     ],
+//   id: '5efd4c6a2403642ebc5155ec'
+// }
 
 prepareDate = (day, month, year) => {
   const sDay = day < 10 ? `0${day}` : day;
