@@ -175,12 +175,19 @@ exports.deleteDayItem = async (req, res, next) => {
     .then(day => day.items)
     .then(items => {
       const array = [...items];
-      return array.splice(array.findIndex((item) => {
+      array.splice(array.findIndex((item) => {
         return item._id.toString() === body.id.toString()
       }), 1);
+      return array;
     })
     .then(async array => {
-      return updateDayElement(id, body.id, array);
+      if (array.length !== 0) {
+        return updateDayElement(id, body.id, array);
+      }
+      return Day.deleteOne({
+        userId: id,
+        'items._id': body.id
+      })
     })
     .then((updatedDay) => {
       res.status(200).json(updatedDay);
