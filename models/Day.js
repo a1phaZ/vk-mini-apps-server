@@ -18,7 +18,9 @@ const DaySchema = new mongoose.Schema({
       income: { type: Boolean },
       modifiers: [Schema.Types.Mixed],
       properties: [Schema.Types.Mixed],
-      canDelete: {type: Boolean, default: false}
+      canDelete: {type: Boolean, default: false},
+      groups: {type: Array, default: []},
+      description: {type: String, default: ''}
     },
   ],
   receipts: [Schema.Types.Mixed],
