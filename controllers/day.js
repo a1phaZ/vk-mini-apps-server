@@ -102,24 +102,20 @@ exports.postDayByReceipt = async (req, res, next) => {
 
         } else {
           const { items } = receiptdata;
-          // await Day.findOne(query)
-          //   .then(async day => {
-          //TODO Need tests!!!
-              if (await checkReceipt(day.receipts, receiptToSave)) {
-                const array = await writeItemsFromCatalog([...day.items, ...items], id).then(res => res.map((item => {
-                  return item.value;
-                })));
-                await Day.updateOne(query, {
-                  $set: { items: array, receipts: [...day.receipts, receiptToSave] },
-                }).then(async () => {
-                  await Day.findOne(query).then(day => {
-                    return res.status(200).json(day);
-                  });
+            if (await checkReceipt(day.receipts, receiptToSave)) {
+              const array = await writeItemsFromCatalog([...day.items, ...items], id).then(res => res.map((item => {
+                return item.value;
+              })));
+              await Day.updateOne(query, {
+                $set: { items: array, receipts: [...day.receipts, receiptToSave] },
+              }).then(async () => {
+                await Day.findOne(query).then(day => {
+                  return res.status(200).json(day);
                 });
-              } else {
-                return next(createError(409, 'Данный чек уже добавлен'));
-              }
-            // })
+              });
+            } else {
+              return next(createError(409, 'Данный чек уже добавлен'));
+            }
         }
       })
       .catch(err => {
