@@ -33,9 +33,7 @@ exports.postDay = async (req, res, next) => {
         const newDay = new Day({
           userId: id,
           dateTime: date,
-          items: await writeItemsFromCatalog([...items], id).then(res => res.map((item => {
-            return item.value;
-          }))),
+          items: items,
         });
         newDay
           .save()
@@ -47,14 +45,9 @@ exports.postDay = async (req, res, next) => {
             next(err)
           });
       } else {
-        const array = await writeItemsFromCatalog([...day.items, ...items], id).then(res => res.map((item => {
-          return item.value;
-        })));
-
-        // await Day.findOneAndUpdate({ userId: id, dateTime: date }, {items: array})
         await Day.updateOne(
           { userId: id, dateTime: date },
-          { $set: { items: array } },
+          { $set: { items: [...day.items, ...items] } },
         ).then(async () => {
           await Day.findOne({ userId: id, dateTime: date }).then(day => {
             return res.status(200).json(day);
@@ -85,37 +78,34 @@ exports.postDayByReceipt = async (req, res, next) => {
     await Day.findOne(query)
       .then(async day => {
         if (!day) {
-          await writeItemsFromCatalog(receiptdata.items, id)
-            .then(res => res.map((item => item.value)))
-            .then(async items => {
-              const newDay = new Day({
-                userId: id,
-                dateTime: d,
-                items: items,
-                receipts: receiptToSave,
-              });
-              return await newDay
-                .save()
-                .then(item => res.status(200).json(item))
-            })
+          const newDay = new Day({
+            userId: id,
+            dateTime: d,
+            items: receiptdata.items,
+            receipts: receiptToSave,
+          });
+          return await newDay
+            .save()
+            .then(item => res.status(200).json(item))
             .catch(err => next(err));
-
         } else {
           const { items } = receiptdata;
-            if (await checkReceipt(day.receipts, receiptToSave)) {
-              const array = await writeItemsFromCatalog([...day.items, ...items], id).then(res => res.map((item => {
-                return item.value;
-              })));
-              await Day.updateOne(query, {
-                $set: { items: array, receipts: [...day.receipts, receiptToSave] },
-              }).then(async () => {
+          if (await checkReceipt(day.receipts, receiptToSave)) {
+            await Day.updateOne(query, {
+              $set: { items: [...day.items, ...items], receipts: [...day.receipts, receiptToSave] },
+            })
+              .then(async () => {
                 await Day.findOne(query).then(day => {
                   return res.status(200).json(day);
                 });
+              })
+              .catch(err => {
+                console.log(err);
+                next(err)
               });
-            } else {
-              return next(createError(409, 'Данный чек уже добавлен'));
-            }
+          } else {
+            return next(createError(409, 'Данный чек уже добавлен'));
+          }
         }
       })
       .catch(err => {
