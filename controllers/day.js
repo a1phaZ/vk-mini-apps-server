@@ -152,14 +152,39 @@ exports.editDayItem = async (req, res, next) => {
         return item._id.toString() === body.id.toString()
       });
       array[index] = {...editedItem}
-      console.log(array);
       return array;
     })
     .then(async (array) => {
-      return await Day.updateOne({
-        userId: id,
-        'items._id': body.id
-      }, { $set: {items: array}}, { new: true })
+      // console.log(array);
+      return updateDayElement(id, body.id, array);
+    })
+    .then((updatedDay) => {
+      res.status(200).json(updatedDay);
+    })
+    .catch(err => {
+      console.log(err);
+      next(err)
+    });
+}
+
+exports.deleteDayItem = async (req, res, next) => {
+  const {
+    body,
+    payload: {id}
+  } = req;
+  await Day.findOne({
+    userId: id,
+    'items._id': body.id
+  })
+    .then(day => day.items)
+    .then(items => {
+      const array = [...items];
+      return array.splice(array.findIndex((item) => {
+        return item._id.toString() === body.id.toString()
+      }), 1);
+    })
+    .then(async array => {
+      return updateDayElement(id, body.id, array);
     })
     .then((updatedDay) => {
       res.status(200).json(updatedDay);
@@ -184,6 +209,20 @@ exports.editDayItem = async (req, res, next) => {
 //     ],
 //   id: '5efd4c6a2403642ebc5155ec'
 // }
+/**
+ * Обновление документа при изменении/удалении элементов
+ * @param {string} userId
+ * @param {string} id
+ * @param {[]} array
+ * @returns {Promise<*>}
+ * @private
+ */
+const updateDayElement = async (userId, id, array) => {
+  return await Day.updateOne({
+    userId: userId,
+    'items._id': id
+  }, { $set: {items: array}}, { new: true })
+}
 
 prepareDate = (day, month, year) => {
   const sDay = day < 10 ? `0${day}` : day;
