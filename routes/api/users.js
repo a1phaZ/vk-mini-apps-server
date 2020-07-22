@@ -25,8 +25,8 @@ router.post('/register', auth.optional, (req, res, next) => {
     .then(() => {
       res.json({user: finalUser.toAuthJson()});
     })
-    .catch(err => {
-      next(err);
+    .catch(() => {
+      next(createError(409, 'Пользователь с данным VK id уже существует.'));
     });
 });
 
