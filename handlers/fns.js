@@ -107,35 +107,44 @@ password = async (req, res, next) => {
     }
   } = req;
 
-  const opt = {
-    method: 'POST',
-    uri: `https://proverkacheka.nalog.ru:9999/v1/mobile/users/${type}`,
-    json: true,
-    body,
-    resolveWithFullResponse: true,
-  };
-  await rp(opt)
-    .then((data) => {
-      console.log(data);
-        res.status(200).json({
-          message: `На телефон ${body.phone} отправлено сообщение с паролем.`,
-        });
-      }
-    )
-    .catch(err => {
+  const getPassword = async () => {
+    try {
+      const opt = {
+        method: 'POST',
+        uri: `https://proverkacheka.nalog.ru:9999/v1/mobile/users/${type}`,
+        json: true,
+        body,
+        resolveWithFullResponse: true,
+      };
+      return await rp(opt);
+    } catch (err) {
       switch (err.statusCode) {
         case 409:
-          return next(createError(err.statusCode, 'Пользователь уже существует.'));
+          throw new Error('Пользователь уже существует.');
         case 500:
-          return next(createError(err.statusCode, 'Некоректный номер телефона, проверьте правильность и повторите попытку.'));
+          throw new Error('Некоректный номер телефона, проверьте правильность и повторите попытку.');
         case 400:
-          return next(createError(err.statusCode, 'Некоректный адрес электронной почты, проверьте правильность и повторите попытку.'));
+          throw new Error('Некоректный адрес электронной почты, проверьте правильность и повторите попытку.');
         case 404:
-          return next(createError(err.statusCode, 'Пользователя не существует.'));
+          throw new Error('Пользователя не существует.');
         default:
-          return next(createError(err.statusCode,'Непредвиденная ошибка на сервере ФНС. Повторите попытку позже.'));
+          throw new Error('Непредвиденная ошибка на сервере ФНС. Повторите попытку позже.');
       }
+    }
+  }
+
+  await getPassword
+    .then((data) => {
+      console.log(data);
+      res.status(200).json({
+        message: `На телефон ${body.phone} отправлено сообщение с паролем.`,
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      return next(createError(err.statusCode, err.message));
     });
+
 };
 
 const fns = {
