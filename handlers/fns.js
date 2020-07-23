@@ -106,6 +106,7 @@ password = async (req, res, next) => {
       type
     }
   } = req;
+
   const opt = {
     method: 'POST',
     uri: `https://proverkacheka.nalog.ru:9999/v1/mobile/users/${type}`,
@@ -114,7 +115,8 @@ password = async (req, res, next) => {
     resolveWithFullResponse: true,
   };
   await rp(opt)
-    .then(() => {
+    .then((data) => {
+      console.log(data);
         res.status(200).json({
           message: `На телефон ${body.phone} отправлено сообщение с паролем.`,
         });
