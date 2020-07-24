@@ -16,6 +16,7 @@ checkAndReceive = async (req, res, next) => {
   try {
     auth =
       'Basic ' + new Buffer(phone.replace(/[ ()-]/g, '') + ':' + password).toString('base64');
+    console.log(auth);
   } catch (e) {
     throw new Error('Ошибка получения телефона из БД. Проверьте профиль и/или отчистите кеш приложения и повторите попытку');
   }
@@ -54,6 +55,7 @@ checkAndReceive = async (req, res, next) => {
         },
       })
     } catch (e) {
+      console.log('error', e);
       console.log('getReceipt', e.statusCode, e.message);
       switch (e.statusCode) {
         case 403:
@@ -91,7 +93,7 @@ checkAndReceive = async (req, res, next) => {
         res.locals.receiptData = { dateTime, totalSum, items };
         next();
       } catch (e) {
-        throw new Error('Чек валидный, но расшифровка не найдена на сервере ФНС. Повторите попытку позже либо введите данные вручную.');
+        next(createError(e.statusCode, e.message));
       }
     })
     .catch(err => {
