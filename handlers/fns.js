@@ -55,11 +55,9 @@ checkAndReceive = async (req, res, next) => {
         },
       })
     } catch (e) {
-      console.log('error', e);
-      console.log('getReceipt', e.statusCode, e.message);
       switch (e.statusCode || e.response.status) {
         case 403:
-          throw new Error('Ошибка авторизации на сервере ФНС. Проверьте правильность телефона и/или пароля и повторите попытку.');
+          throw new Error('Ошибка авторизации на сервере ФНС. Проверьте правильность телефона и/или пароля и повторите попытку. Если все введено верно, то отчистите кэш приложения и повторите попытку.');
         case 400:
           throw new Error('Непредвиденная ошибка на сервере ФНС. Повторите попытку позже либо введите данные вручную.');
         case 500:
