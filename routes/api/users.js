@@ -61,6 +61,34 @@ router.post('/login', auth.optional, (req, res, next) => {
   })(req, res, next);
 });
 
+router.post('/restore', auth.optional, (req, res, next) => {
+  const {
+    body: { user: {id, password} }
+  } = req;
+
+  if (!id) {
+    return next(createError(422, 'Отсутствует идентификатор пользователя'));
+  }
+
+  if (!password) {
+    return next(createError(422, 'Неверный пароль или пароль отсутствует'));
+  }
+
+  User.findOne({id})
+    .then(user => {
+      if (!user) {
+        return next(createError(404, 'Пользователь не найден'));
+      }
+
+      user.setPassword(password);
+      return user.save()
+    })
+    .then(data => {
+      return res.json({ user: data.toAuthJson() });
+    })
+    .catch(err => next(err));
+});
+
 router.get('/profile', auth.required, (req, res, next) => {
   const {
     payload: { id },
