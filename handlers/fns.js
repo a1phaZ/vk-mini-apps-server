@@ -91,7 +91,7 @@ checkAndReceive = async (req, res, next) => {
         res.locals.receiptData = { dateTime, totalSum, items };
         next();
       } catch (e) {
-        next(createError(e.statusCode, e.message));
+        next(createError(422, 'Сервер ФНС перегружен, расшифровка не получена, повторите запрос позже.'));
       }
     })
     .catch(err => {
