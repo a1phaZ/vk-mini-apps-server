@@ -115,6 +115,14 @@ router.put('/profile', auth.required, async (req, res, next) => {
     body: { update },
   } = req;
 
+  if (update.phone) {
+    let phone = update.phone;
+    phone = phone.replace(/[ ()-]/g, '').replace(/^[8]/g, '+7');
+    if (!phone.match(/^\+7\d{10}$/g)) {
+      return next(createError(422, 'Ошибка телефона, проверьте введенный телефон'));
+    }
+  }
+
   await User.updateOne({_id: id}, {$set: update}, {upsert: true})
     .then(async () => {
       return User.findOne({_id: id});
