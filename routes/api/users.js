@@ -11,11 +11,13 @@ router.post('/register', auth.optional, (req, res, next) => {
   } = req;
 
   if (!user.id) {
-    return next(createError(422, 'id is required'));
+    return next(createError(422, 'Отсутствует идентификатор пользователя'));
   }
 
   if (!user.password) {
-    return next(createError(422, 'password is required'));
+    return next(createError(422, 'Неверный пароль или пароль отсутствует'));
+  } else if (user.password.length !== 4 ) {
+    return next(createError(422, 'Неверное кол-во символов пин кода'));
   }
 
   const finalUser = new User(user);
@@ -72,6 +74,8 @@ router.post('/restore', auth.optional, (req, res, next) => {
 
   if (!password) {
     return next(createError(422, 'Неверный пароль или пароль отсутствует'));
+  } else if (password.length !== 4 ) {
+    return next(createError(422, 'Неверное кол-во символов пин кода'));
   }
 
   User.findOne({id})
@@ -117,25 +121,6 @@ router.put('/profile', auth.required, async (req, res, next) => {
     })
     .then(async (user) => {
       return await res.json({user: user.toAuthJson()});
-    })
-    .catch(err => next(err));
-
-  // await User.findOneAndUpdate({_id: id}, { $set: update }, { new: true })
-  //   .then(user => {
-  //     console.log(user);
-  //     res.json({user: user.toAuthJson()});
-  //   })
-  //   .catch(err => next(err));
-});
-
-router.get('/find', auth.optional, async (req, res, next) => {
-  const {
-    query: { id }
-  } = req;
-  await User.findOne({id})
-    .then((user) => {
-      if (!user) res.json({result: false, message: 'Пользователь не найден'});
-      res.json({result: true, message: 'Пользователь найден'});
     })
     .catch(err => next(err));
 });
