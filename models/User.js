@@ -6,7 +6,11 @@ mongoose.Promise = global.Promise;
 
 const UserSchema = new Schema(
   {
-    id: {type: Number, unique: true},
+    id: {
+      type: Number,
+      unique: true,
+      required: [true, 'Отсутствует идентификатор пользователя']
+    },
     email: { type: String },
     hash: { type: String },
     salt: { type: String },
