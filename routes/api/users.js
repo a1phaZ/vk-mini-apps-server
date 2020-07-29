@@ -133,6 +133,11 @@ router.put('/profile', auth.required, async (req, res, next) => {
     .catch(err => next(err));
 });
 
+/**
+ * Метод нужен для определения есть ли пользователь в базе
+ * если да, то выводим страницу авторизации,
+ * если нет, то регистрация
+ */
 router.get('/find', auth.optional, async (req, res, next) => {
   const {
     query: { id }
