@@ -133,4 +133,16 @@ router.put('/profile', auth.required, async (req, res, next) => {
     .catch(err => next(err));
 });
 
+router.get('/find', auth.optional, async (req, res, next) => {
+  const {
+    query: { id }
+  } = req;
+  await User.findOne({id})
+    .then((user) => {
+      if (!user) res.json({result: false, message: 'Пользователь не найден'});
+      res.json({result: true, message: 'Пользователь найден'});
+    })
+    .catch(err => next(err));
+});
+
 module.exports = router;
