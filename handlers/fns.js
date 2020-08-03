@@ -34,7 +34,7 @@ checkAndReceive = async (req, res, next) => {
     } catch (e) {
       console.log('getCheck', e.statusCode, e.message);
       console.log(e);
-      switch (e.statusCode) {
+      switch (e.statusCode || e.status) {
         case 406:
           throw new Error('Чек не найден в БД ФНС, возможно чек не валидный. Повторите попытку позже либо введите данные вручную.');
         case 400:
