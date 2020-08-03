@@ -16,7 +16,6 @@ checkAndReceive = async (req, res, next) => {
   try {
     auth =
       'Basic ' + new Buffer(phone.replace(/[ ()-]/g, '') + ':' + password).toString('base64');
-    console.log(auth);
   } catch (e) {
     throw new Error('Ошибка получения телефона из БД. Проверьте профиль и/или отчистите кеш приложения и повторите попытку');
   }
@@ -34,6 +33,7 @@ checkAndReceive = async (req, res, next) => {
       return await instance.get(`https://proverkacheka.nalog.ru:9999/v1/ofds/*/inns/*/fss/${fn}/operations/1/tickets/${i}?fiscalSign=${fp}&date=${dt}&sum=${sum}`);
     } catch (e) {
       console.log('getCheck', e.statusCode, e.message);
+      console.log(e);
       switch (e.statusCode) {
         case 406:
           throw new Error('Чек не найден в БД ФНС, возможно чек не валидный. Повторите попытку позже либо введите данные вручную.');
